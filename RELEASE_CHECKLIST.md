@@ -10,6 +10,7 @@
 - [ ] Create icon, screenshots, and Privacy Manifest
 - [ ] Publish privacy policy
 - [ ] Build a signed iOS archive
+- [x] Start the first Codemagic build (blocked before compilation: App Store provisioning profile missing)
 - [ ] Distribute internal TestFlight build
 - [ ] Test purchase and restore on iPhone
 - [ ] Confirm Add for Review / Submit for Review
