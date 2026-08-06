@@ -243,6 +243,15 @@
     padding:13px 14px; margin-bottom:8px; font-size:14px; font-weight:700; color:var(--navy); font-family:inherit;
   }
   .modal-cat-btn:active{background:#eef0fb; border-color:var(--line);}
+  .modal-round-note{font-size:11px; line-height:1.6; color:var(--gray-soft); margin:-4px 0 14px;}
+  .modal-round-section{margin-bottom:15px;}
+  .modal-round-title{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; font-size:12px; color:var(--navy);}
+  .modal-round-title small{font-size:10px; color:var(--gray-soft); font-weight:600;}
+  .modal-round-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .modal-round-btn{width:100%; text-align:left; background:var(--bg); border:1px solid transparent; border-radius:13px; padding:11px 12px; color:var(--navy); font-family:inherit;}
+  .modal-round-btn strong{display:block; font-size:12px; line-height:1.35;}
+  .modal-round-btn small{display:block; margin-top:3px; color:var(--gray-soft); font-size:10px; font-weight:600;}
+  .modal-round-btn:active{background:#eef0fb; border-color:var(--line);}
   .modal-close{width:100%; background:none; border:none; padding:12px; color:var(--gray-soft); font-size:13px; font-weight:700;}
 </style>
 </head>
@@ -286,6 +295,11 @@
       <button class="mode-btn" data-mode="category">
         <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
         <div class="m-body"><div class="m-title">分野別</div><div class="m-sub">苦手分野を集中して復習</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="mode-btn" data-mode="examPicker">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/><path d="m15 16 1.5 1.5L20 14"/></svg></div>
+        <div class="m-body"><div class="m-title">試験回・分野別</div><div class="m-sub">学習用の3回分から、分野を選んで出題</div></div>
         <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
       </button>
       <button class="mode-btn" data-mode="unseen">
@@ -400,6 +414,16 @@
     <h3>分野を選ぶ</h3>
     <div id="modal-cat-list"></div>
     <button class="modal-close" id="modal-cat-close">閉じる</button>
+  </div>
+</div>
+
+<!-- Exam round and category picker modal -->
+<div class="modal-bg" id="modal-exam">
+  <div class="modal-sheet">
+    <h3>試験回・分野を選ぶ</h3>
+    <p class="modal-round-note">公式過去問の試験回ではなく、212問を学習用に3回分へ均等分割しています。各回の中から分野を選べます。</p>
+    <div id="modal-exam-list"></div>
+    <button class="modal-close" id="modal-exam-close">閉じる</button>
   </div>
 </div>
 
@@ -944,12 +968,22 @@ function shuffle(arr){
   return arr;
 }
 
-function buildQueue(mode, catIndex){
+function examRoundForQuestion(q){
+  const inCategory = QUESTIONS.filter(item=>item.cat===q.cat);
+  const index = inCategory.findIndex(item=>item.id===q.id);
+  return Math.min(2, Math.floor(index * 3 / inCategory.length));
+}
+function examRoundQuestions(roundIndex, catIndex){
+  return QUESTIONS.filter(q=>q.cat===catIndex && examRoundForQuestion(q)===roundIndex);
+}
+
+function buildQueue(mode, catIndex, roundIndex){
   switch(mode){
     case "sprint12": return pickPerCategory(2, QUESTIONS);
     case "training30": return pickPerCategory(5, QUESTIONS);
     case "challenge60": return pickPerCategory(10, QUESTIONS);
     case "category": return shuffle(QUESTIONS.filter(q=>q.cat===catIndex).map(q=>q.id));
+    case "examRoundCategory": return examRoundQuestions(roundIndex, catIndex).map(q=>q.id);
     case "unseen": {
       let q = QUESTIONS.filter(q=>store.records[q.id].seen===0);
       if(q.length===0) q = QUESTIONS.slice();
@@ -970,22 +1004,24 @@ function buildQueue(mode, catIndex){
 
 const MODE_LABEL = {
   sprint12:"12問スプリント", training30:"30問トレーニング", challenge60:"60問チャレンジ",
-  category:"分野別", unseen:"未出題", wrong:"間違えた問題", weak:"苦手問題", random:"ランダム"
+  category:"分野別", examRoundCategory:"試験回・分野別", unseen:"未出題", wrong:"間違えた問題", weak:"苦手問題", random:"ランダム"
 };
 
-function startSession(mode, catIndex){
-  const queue = buildQueue(mode, catIndex);
+function startSession(mode, catIndex, roundIndex){
+  const queue = buildQueue(mode, catIndex, roundIndex);
   if(queue.length===0){
     alert("対象の問題がまだありません。他のモードを試してください。");
     return;
   }
   session = {
-    mode, queue, idx:0, correctCount:0,
+    mode, catIndex, roundIndex, queue, idx:0, correctCount:0,
     startedAt: Date.now(),
     catStats: {}, // cat -> {correct, total}
     reviewIds: []
   };
-  $("#quiz-mode-name").textContent = MODE_LABEL[mode] || "学習";
+  $("#quiz-mode-name").textContent = mode === "examRoundCategory"
+    ? `第${roundIndex + 1}回・${CATEGORIES[catIndex]}`
+    : (MODE_LABEL[mode] || "学習");
   show("screen-quiz");
   renderQuestion();
 }
@@ -1221,6 +1257,7 @@ document.querySelectorAll(".mode-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     const mode = btn.dataset.mode;
     if(mode==="category"){ openCategoryModal(); return; }
+    if(mode==="examPicker"){ openExamPicker(); return; }
     startSession(mode);
   });
 });
@@ -1242,6 +1279,34 @@ function closeCategoryModal(){ $("#modal-cat").classList.remove("active"); }
 $("#modal-cat-close").addEventListener("click", closeCategoryModal);
 $("#modal-cat").addEventListener("click", e=>{ if(e.target.id==="modal-cat") closeCategoryModal(); });
 
+function openExamPicker(){
+  const list = $("#modal-exam-list");
+  list.innerHTML = "";
+  for(let round=0; round<3; round++){
+    const section = document.createElement("section");
+    section.className = "modal-round-section";
+    const total = QUESTIONS.filter(q=>examRoundForQuestion(q)===round).length;
+    section.innerHTML = `<div class="modal-round-title"><span>第${round+1}回</span><small>全${total}問</small></div><div class="modal-round-grid"></div>`;
+    const grid = section.querySelector(".modal-round-grid");
+    CATEGORIES.forEach((name, catIndex)=>{
+      const count = examRoundQuestions(round, catIndex).length;
+      const button = document.createElement("button");
+      button.className = "modal-round-btn";
+      button.innerHTML = `<strong>${name}</strong><small>${count}問を出題</small>`;
+      button.addEventListener("click", ()=>{
+        closeExamPicker();
+        startSession("examRoundCategory", catIndex, round);
+      });
+      grid.appendChild(button);
+    });
+    list.appendChild(section);
+  }
+  $("#modal-exam").classList.add("active");
+}
+function closeExamPicker(){ $("#modal-exam").classList.remove("active"); }
+$("#modal-exam-close").addEventListener("click", closeExamPicker);
+$("#modal-exam").addEventListener("click", e=>{ if(e.target.id==="modal-exam") closeExamPicker(); });
+
 $("#btn-quiz-back").addEventListener("click", ()=>{
   clearTimeout(autoTimer);
   refreshHome();
@@ -1250,7 +1315,7 @@ $("#btn-quiz-back").addEventListener("click", ()=>{
 $("#btn-next").addEventListener("click", goNext);
 $("#btn-continue").addEventListener("click", ()=>{
   const mode = session.mode;
-  startSession(mode);
+  startSession(mode, session.catIndex, session.roundIndex);
 });
 $("#btn-home").addEventListener("click", ()=>{
   refreshHome();
