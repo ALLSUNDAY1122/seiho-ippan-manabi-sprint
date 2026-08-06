@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>生命保険 一般課程試験｜学びスプリント</title>
+<style>
+  :root{
+    --navy:#141b3d;
+    --navy-2:#232f68;
+    --navy-3:#3a4694;
+    --orange:#f2790f;
+    --orange-2:#ffab3d;
+    --bg:#f3f4f9;
+    --white:#ffffff;
+    --gray:#6b7280;
+    --gray-soft:#9aa1b5;
+    --line:#e8e9f0;
+    --red:#d6455a;
+    --green:#1a9d63;
+    --radius:18px;
+    --shadow-sm:0 1px 2px rgba(20,27,61,.05), 0 1px 3px rgba(20,27,61,.06);
+    --shadow-md:0 4px 10px rgba(20,27,61,.08), 0 1px 3px rgba(20,27,61,.05);
+    --shadow-lg:0 12px 28px rgba(20,27,61,.14), 0 2px 6px rgba(20,27,61,.06);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro JP","Hiragino Sans","Yu Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--navy);
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background:
+      radial-gradient(520px 260px at 50% -80px, rgba(20,27,61,.05), transparent 70%),
+      var(--bg);
+    display:flex;
+    flex-direction:column;
+    padding-bottom:env(safe-area-inset-bottom);
+    position:relative;
+  }
+  .screen{display:none; flex:1; flex-direction:column; padding:22px 18px 30px;}
+  .screen.active{display:flex; animation:screenIn .32s cubic-bezier(.2,.7,.3,1);}
+  @keyframes screenIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .icon{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;}
+
+  /* ---------- Home ---------- */
+  .brand-head{ text-align:center; padding:14px 0 6px; }
+  .brand-head .app-icon{
+    width:68px; height:68px; border-radius:20px; margin:0 auto 14px;
+    background:linear-gradient(145deg,var(--navy-3),var(--navy) 65%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-lg);
+    position:relative;
+  }
+  .brand-head .app-icon::after{
+    content:""; position:absolute; inset:0; border-radius:inherit;
+    background:linear-gradient(160deg, rgba(255,255,255,.22), transparent 55%);
+  }
+  .brand-head .app-icon .icon{width:32px; height:32px; stroke:#fff; stroke-width:1.7; position:relative; z-index:1;}
+  .brand-head h1{font-size:18px; margin:0 0 6px; font-weight:800; letter-spacing:.01em; line-height:1.4;}
+  .brand-head .tagline{
+    display:inline-block; color:var(--orange); font-weight:800; font-size:14px; margin:0;
+    letter-spacing:.01em;
+  }
+  .brand-head .sub{color:var(--gray-soft); font-size:11.5px; margin-top:5px; font-weight:600; letter-spacing:.02em;}
+
+  .stat-row{ display:flex; gap:8px; margin:20px 0 6px; }
+  .stat-card{
+    flex:1; background:var(--white); border-radius:16px; padding:13px 8px 12px;
+    text-align:center; box-shadow:var(--shadow-sm); border:1px solid rgba(20,27,61,.03);
+  }
+  .stat-card .v{font-size:19px; font-weight:800; color:var(--navy); letter-spacing:-.01em;}
+  .stat-card .l{font-size:10px; color:var(--gray-soft); margin-top:3px; font-weight:600;}
+
+  .section-label{
+    font-size:11.5px; color:var(--gray-soft); font-weight:800; margin:22px 4px 10px;
+    text-transform:uppercase; letter-spacing:.08em;
+  }
+
+  .mode-grid{display:flex; flex-direction:column; gap:9px;}
+  .mode-btn{
+    background:var(--white); border:1px solid rgba(20,27,61,.05); border-radius:var(--radius);
+    padding:13px 14px; display:flex; align-items:center; gap:12px;
+    text-align:left; font-family:inherit; cursor:pointer; box-shadow:var(--shadow-sm);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .mode-btn .m-icon{
+    width:40px; height:40px; border-radius:12px; flex-shrink:0;
+    background:#eef0fb; color:var(--navy-2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mode-btn .m-body{flex:1; min-width:0;}
+  .mode-btn .m-title{font-size:14.5px; font-weight:800; color:var(--navy);}
+  .mode-btn .m-sub{font-size:11px; color:var(--gray-soft); margin-top:2px; font-weight:500;}
+  .mode-btn .m-count{font-size:11px; color:var(--orange); font-weight:800; flex-shrink:0;}
+  .mode-btn .m-arrow{width:16px; height:16px; stroke:var(--gray-soft); flex-shrink:0;}
+  .mode-btn.primary{
+    background:linear-gradient(135deg,var(--navy-3),var(--navy) 70%); border-color:transparent;
+    box-shadow:0 8px 20px rgba(20,27,61,.22);
+  }
+  .mode-btn.primary .m-icon{background:rgba(255,255,255,.16); color:#fff;}
+  .mode-btn.primary .m-title{color:#fff;}
+  .mode-btn.primary .m-sub{color:#aeb6e8;}
+  .mode-btn.primary .m-count{color:var(--orange-2);}
+  .mode-btn.primary .m-arrow{stroke:#aeb6e8;}
+  .mode-btn:active{transform:scale(0.97); box-shadow:var(--shadow-sm);}
+
+  .home-foot{
+    margin-top:24px; text-align:center; font-size:10px; color:var(--gray-soft);
+    line-height:1.7; padding:14px 10px 0; border-top:1px solid var(--line);
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-top{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 14px;}
+  .quiz-top .back{
+    display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:var(--gray);
+    background:none; border:none; padding:6px 4px; font-family:inherit;
+  }
+  .quiz-top .mode-name{
+    font-size:11px; font-weight:800; color:var(--navy-2); background:#eef0fb;
+    padding:5px 11px; border-radius:999px;
+  }
+  .progress-wrap{background:var(--white); border-radius:999px; height:7px; overflow:hidden; margin-bottom:7px; box-shadow:inset 0 1px 2px rgba(20,27,61,.06);}
+  .progress-bar{background:linear-gradient(90deg,var(--orange),var(--orange-2)); height:100%; width:0%; border-radius:999px; transition:width .3s cubic-bezier(.3,.7,.3,1);}
+  .progress-text{display:flex; justify-content:space-between; font-size:11px; color:var(--gray-soft); font-weight:700; margin-bottom:16px;}
+
+  .q-card{
+    background:var(--white); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-md);
+    margin-bottom:16px; border:1px solid rgba(20,27,61,.03);
+    animation:cardIn .28s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes cardIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .q-cat-tag{
+    display:inline-block; background:#eef0fb; color:var(--navy-2); font-size:10px; font-weight:800;
+    padding:5px 10px; border-radius:999px; margin-bottom:12px; letter-spacing:.01em;
+  }
+  .q-text{font-size:15.5px; line-height:1.7; font-weight:600; color:var(--navy); white-space:pre-wrap;}
+
+  .choices{display:flex; flex-direction:column; gap:9px;}
+  .choices.tf{flex-direction:row;}
+  .choice-btn{
+    flex:1; background:var(--white); border:1.5px solid var(--line); border-radius:14px;
+    padding:14px; font-size:14.5px; font-weight:700; color:var(--navy); font-family:inherit; cursor:pointer;
+    box-shadow:var(--shadow-sm); transition:transform .12s ease, border-color .15s ease, background .15s ease;
+    animation:choiceIn .32s cubic-bezier(.2,.7,.3,1) backwards;
+  }
+  .choices > .choice-btn:nth-child(1){animation-delay:.02s;}
+  .choices > .choice-btn:nth-child(2){animation-delay:.06s;}
+  .choices > .choice-btn:nth-child(3){animation-delay:.10s;}
+  .choices > .choice-btn:nth-child(4){animation-delay:.14s;}
+  @keyframes choiceIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .choice-btn:active{transform:scale(0.97);}
+  .choice-btn.correct{background:#e9f9ee; border-color:var(--green); color:var(--green);}
+  .choice-btn.wrong{background:#fdecef; border-color:var(--red); color:var(--red);}
+  .choice-btn.dim{opacity:.4;}
+  .choice-btn[disabled]{pointer-events:none;}
+  .choice-btn.selected{background:#eef0fb; border-color:var(--navy-3); box-shadow:0 0 0 2px rgba(58,70,148,.12);}
+  .multi-hint{font-size:12px; color:var(--gray); font-weight:700; margin-bottom:9px;}
+  .next-btn[disabled]{opacity:.32; pointer-events:none; box-shadow:none;}
+
+  .result-banner{
+    display:flex; align-items:center; gap:10px; padding:13px 15px; border-radius:14px;
+    margin-bottom:12px; font-weight:800; font-size:14px; animation:cardIn .25s ease;
+  }
+  .result-banner.ok{background:#e9f9ee; color:var(--green);}
+  .result-banner.ng{background:#fdecef; color:var(--red);}
+
+  .explain-box{background:var(--white); border-radius:var(--radius); padding:17px; box-shadow:var(--shadow-md); border:1px solid rgba(20,27,61,.03);}
+  .explain-row{margin-bottom:11px;}
+  .explain-row:last-child{margin-bottom:0;}
+  .explain-label{font-size:10.5px; font-weight:800; color:var(--orange); margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em;}
+  .explain-body{font-size:13.5px; color:#374057; line-height:1.65;}
+
+  .next-btn{
+    margin-top:16px; background:linear-gradient(135deg,var(--navy-3),var(--navy) 75%); color:#fff; border:none; border-radius:14px;
+    padding:15px; font-size:15px; font-weight:800; font-family:inherit; cursor:pointer;
+    box-shadow:0 8px 18px rgba(20,27,61,.2);
+  }
+  .next-btn:active{transform:scale(0.98);}
+  .auto-hint{text-align:center; font-size:11px; color:var(--gray-soft); margin-top:9px; font-weight:600;}
+
+  /* ---------- Result ---------- */
+  .result-hero{text-align:center; padding:18px 0 8px; position:relative;}
+  .ring-wrap{width:148px; height:148px; margin:0 auto; position:relative;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-track{fill:none; stroke:var(--line); stroke-width:10;}
+  .ring-fill{fill:none; stroke:url(#ringGrad); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset .7s cubic-bezier(.2,.7,.3,1);}
+  .ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .result-hero .big{font-size:32px; font-weight:900; color:var(--navy); letter-spacing:-.02em; line-height:1;}
+  .result-hero .cap{font-size:11.5px; color:var(--gray-soft); margin-top:4px; font-weight:700;}
+  .result-msg{
+    background:var(--white); border-radius:14px; padding:14px; text-align:center;
+    font-size:13.5px; font-weight:700; color:var(--navy-2); margin:16px 0;
+    box-shadow:var(--shadow-sm);
+  }
+  .r-grid{display:flex; gap:8px; margin-bottom:14px;}
+  .r-card{flex:1; background:var(--white); border-radius:14px; padding:12px 6px; text-align:center; box-shadow:var(--shadow-sm);}
+  .r-card .v{font-size:17px; font-weight:800;}
+  .r-card .l{font-size:10px; color:var(--gray-soft); margin-top:2px; font-weight:600;}
+
+  .weak-box{background:var(--white); border-radius:16px; padding:15px; margin-bottom:10px; box-shadow:var(--shadow-sm);}
+  .weak-box h3{font-size:11.5px; margin:0 0 9px; color:var(--gray-soft); font-weight:800; text-transform:uppercase; letter-spacing:.06em;}
+  .weak-item{display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:7px 0; border-bottom:1px solid var(--line);}
+  .weak-item:last-child{border-bottom:none;}
+  .weak-item .n{font-weight:700; color:var(--navy);}
+  .weak-item .p{color:var(--orange); font-weight:800; flex-shrink:0;}
+  .empty-weak{font-size:12px; color:var(--gray-soft); text-align:center; padding:6px 0;}
+
+  .result-actions{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  .btn-orange{
+    background:linear-gradient(135deg,var(--orange-2),var(--orange)); color:#fff; border:none; border-radius:14px;
+    padding:15px; font-size:15px; font-weight:800; font-family:inherit;
+    box-shadow:0 8px 18px rgba(242,121,15,.28);
+  }
+  .btn-orange:active{transform:scale(0.98);}
+  .btn-outline{background:var(--white); color:var(--navy); border:1.5px solid var(--line); border-radius:14px; padding:15px; font-size:14px; font-weight:700; font-family:inherit;}
+  .btn-outline:active{transform:scale(0.98);}
+
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(15,20,45,.55); display:none;
+    align-items:flex-end; justify-content:center; z-index:50; backdrop-filter:blur(2px);
+  }
+  .modal-bg.active{display:flex; animation:fadeBg .2s ease;}
+  @keyframes fadeBg{from{opacity:0;} to{opacity:1;}}
+  .modal-sheet{
+    background:#fff; width:100%; max-width:480px; border-radius:22px 22px 0 0;
+    padding:22px 20px calc(20px + env(safe-area-inset-bottom));
+    box-shadow:0 -8px 30px rgba(20,27,61,.2);
+    animation:sheetUp .25s cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes sheetUp{from{transform:translateY(24px); opacity:.6;} to{transform:translateY(0); opacity:1;}}
+  .modal-sheet h3{margin:0 0 14px; font-size:15px; color:var(--navy); font-weight:800;}
+  .modal-cat-btn{
+    width:100%; text-align:left; background:var(--bg); border:1px solid transparent; border-radius:13px;
+    padding:13px 14px; margin-bottom:8px; font-size:14px; font-weight:700; color:var(--navy); font-family:inherit;
+  }
+  .modal-cat-btn:active{background:#eef0fb; border-color:var(--line);}
+  .modal-close{width:100%; background:none; border:none; padding:12px; color:var(--gray-soft); font-size:13px; font-weight:700;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= HOME ================= -->
+  <section class="screen active" id="screen-home">
+    <div class="brand-head">
+      <div class="app-icon">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2.5l7.5 3v6c0 5-3.2 8.6-7.5 10-4.3-1.4-7.5-5-7.5-10v-6l7.5-3z"/><path d="M9 12l2 2 4-4.2"/></svg>
+      </div>
+      <h1>生命保険 一般課程試験｜学びスプリント</h1>
+      <p class="tagline">解くたびに、自信になる。</p>
+      <p class="sub">短く走って、合格へ。</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="v" id="stat-solved">0</div><div class="l">総解答数</div></div>
+      <div class="stat-card"><div class="v" id="stat-rate">–</div><div class="l">通算正答率</div></div>
+      <div class="stat-card"><div class="v" id="stat-rounds">0</div><div class="l">周回数</div></div>
+    </div>
+
+    <div class="section-label">出題モード</div>
+    <div class="mode-grid">
+      <button class="mode-btn primary" data-mode="sprint12">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+        <div class="m-body"><div class="m-title">12問スプリント</div><div class="m-sub">3〜5分・6分野から2問ずつ</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="mode-btn" data-mode="training30">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div class="m-body"><div class="m-title">30問トレーニング</div><div class="m-sub">6分野から5問ずつ</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="mode-btn" data-mode="challenge60">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 4"/><path d="M17 5h3a3 3 0 0 1-3 4"/></svg></div>
+        <div class="m-body"><div class="m-title">60問チャレンジ</div><div class="m-sub">6分野から10問ずつ・本番相当のボリューム</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="mode-btn" data-mode="category">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        <div class="m-body"><div class="m-title">分野別</div><div class="m-sub">苦手分野を集中して復習</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="mode-btn" data-mode="unseen">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="4 3"/></svg></div>
+        <div class="m-body"><div class="m-title">未出題</div><div class="m-sub">まだ解いていない問題だけ</div></div>
+        <span class="m-count" id="count-unseen"></span>
+      </button>
+      <button class="mode-btn" data-mode="wrong">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></div>
+        <div class="m-body"><div class="m-title">間違えた問題</div><div class="m-sub">直近で不正解だった問題</div></div>
+        <span class="m-count" id="count-wrong"></span>
+      </button>
+      <button class="mode-btn" data-mode="weak">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 8.6c0 5.4-8.8 10.4-8.8 10.4S3.2 14 3.2 8.6a4.6 4.6 0 0 1 8.8-1.9 4.6 4.6 0 0 1 8.8 1.9z"/></svg></div>
+        <div class="m-body"><div class="m-title">苦手問題</div><div class="m-sub">繰り返し間違えている問題</div></div>
+        <span class="m-count" id="count-weak"></span>
+      </button>
+      <button class="mode-btn" data-mode="random">
+        <div class="m-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20 20 4"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></div>
+        <div class="m-body"><div class="m-title">ランダム</div><div class="m-sub">全212問からシャッフル出題</div></div>
+        <svg class="icon m-arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="home-foot">
+      生命保険一般課程試験の出題形式にならった独自作成問題です。<br>
+      特定の生命保険会社の社内資料は使用していません。<br>
+      本アプリは初期試作版（v0.4.0・全212問）です。
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <button class="back" id="btn-quiz-back"><svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;"><path d="M15 5l-7 7 7 7"/></svg>ホーム</button>
+      <div class="mode-name" id="quiz-mode-name">12問スプリント</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="progress-text">
+      <span id="progress-count">1 / 12</span>
+      <span id="progress-streak">連続正解 0</span>
+    </div>
+
+    <div class="q-card">
+      <span class="q-cat-tag" id="q-cat-tag">分野</span>
+      <div class="q-text" id="q-text">問題文</div>
+    </div>
+
+    <div id="choices-area"></div>
+
+    <div id="answer-area" style="display:none;">
+      <div class="result-banner" id="result-banner"></div>
+      <div class="explain-box">
+        <div class="explain-row"><div class="explain-label">結論</div><div class="explain-body" id="ex-conclusion"></div></div>
+        <div class="explain-row"><div class="explain-label">理由</div><div class="explain-body" id="ex-reason"></div></div>
+        <div class="explain-row" id="ex-note-row"><div class="explain-label">注意点</div><div class="explain-body" id="ex-note"></div></div>
+      </div>
+      <button class="next-btn" id="btn-next">次の問題へ</button>
+      <div class="auto-hint" id="auto-hint">まもなく自動で次に進みます</div>
+    </div>
+  </section>
+
+  <!-- ================= RESULT ================= -->
+  <section class="screen" id="screen-result">
+    <div class="result-hero">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 148 148" width="148" height="148">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:var(--orange-2)"/>
+              <stop offset="100%" style="stop-color:var(--orange)"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-track" cx="74" cy="74" r="64"/>
+          <circle class="ring-fill" id="ring-fill" cx="74" cy="74" r="64" stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="ring-center">
+          <div class="big" id="r-score">0/12</div>
+          <div class="cap">正答数</div>
+        </div>
+      </div>
+    </div>
+    <div class="result-msg" id="r-message">今日も12問進みました</div>
+
+    <div class="r-grid">
+      <div class="r-card"><div class="v" id="r-rate">0%</div><div class="l">正答率</div></div>
+      <div class="r-card"><div class="v" id="r-time">0:00</div><div class="l">所要時間</div></div>
+      <div class="r-card"><div class="v" id="r-rounds">1</div><div class="l">周回数</div></div>
+    </div>
+
+    <div class="weak-box">
+      <h3>分野別 正答率（今回）</h3>
+      <div id="r-cat-breakdown"></div>
+    </div>
+
+    <div class="weak-box">
+      <h3>復習対象</h3>
+      <div id="r-review"></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-orange" id="btn-continue">もう12問続ける</button>
+      <button class="btn-outline" id="btn-home">ホームに戻る</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Category picker modal -->
+<div class="modal-bg" id="modal-cat">
+  <div class="modal-sheet">
+    <h3>分野を選ぶ</h3>
+    <div id="modal-cat-list"></div>
+    <button class="modal-close" id="modal-cat-close">閉じる</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   生命保険 一般課程試験｜学びスプリント　初期試作 v0.4.0（全212問・デザイン刷新版）
+   単一HTML・端末内保存（localStorage）・広告/ログインなし
+   ========================================================= */
+
+const CATEGORIES = [
+  "生命保険の基礎知識",
+  "保険約款・契約手続き",
+  "保険募集のルール・コンプライアンス",
+  "保険と税金",
+  "関連法規（保険業法等）",
+  "商品知識（主契約・特約）"
+];
+
+// type: "tf" = ○×, "choice" = ア/イ/ウ
+const QUESTIONS = [
+// 1. 生命保険の基礎知識
+{id:"g01",cat:0,type:"tf",q:"死亡保険のうち、保険期間をあらかじめ定めているものを「定期保険」という。",a:"○",
+ conclusion:"正しい。",reason:"保険期間を一定の期間に区切って死亡保障を確保する保険を定期保険という。",note:"保険期間が被保険者の一生涯にわたるものは終身保険と呼ばれ区別される。"},
+{id:"g02",cat:0,type:"tf",q:"終身保険は、保険期間が被保険者の一生涯にわたる死亡保険である。",a:"○",
+ conclusion:"正しい。",reason:"終身保険は保障が一生涯続くため、途中で保障がなくなることがない。",note:"保険料払込期間と保障期間は別であり、払込満了後も保障は継続する。"},
+{id:"g03",cat:0,type:"tf",q:"生存保険とは、被保険者が保険期間満了時に生存している場合にのみ保険金が支払われる保険である。",a:"○",
+ conclusion:"正しい。",reason:"個人年金保険など、生存を条件に給付が行われる保険が該当する。",note:"死亡保障を全く持たないタイプと、最低限の死亡給付を持つタイプがある。"},
+{id:"g04",cat:0,type:"tf",q:"養老保険は、死亡保障と生存保障を組み合わせた保険で、満期まで生存すれば満期保険金が支払われる。",a:"○",
+ conclusion:"正しい。",reason:"養老保険は保険期間中に死亡すれば死亡保険金、満期まで生存すれば満期保険金が支払われる。",note:"死亡保険金と満期保険金は同額であるのが一般的な設計である。"},
+{id:"g05",cat:0,type:"tf",q:"生命保険の保険料は、予定死亡率・予定利率・予定事業費率の3つの予定基礎率をもとに計算される。",a:"○",
+ conclusion:"正しい。",reason:"この3つの予定基礎率を用いて保険料が算出される。",note:"予定基礎率と実際の実績との差が「剰余金」として配当の原資になることがある。"},
+{id:"g06",cat:0,type:"tf",q:"予定利率を高く設定すると、一般に保険料は高くなる。",a:"×",
+ conclusion:"誤り。",reason:"予定利率を高く設定するほど、保険会社が見込む運用収益が大きくなるため、必要な保険料は安くなる。",note:"予定利率と保険料は逆の関係にある点を混同しないよう注意する。"},
+{id:"g07",cat:0,type:"tf",q:"責任準備金とは、将来の保険金・給付金の支払いに備えて、保険会社が積み立てている準備金のことである。",a:"○",
+ conclusion:"正しい。",reason:"責任準備金は将来の保険金等の支払財源として保険会社が積み立てる準備金である。",note:"解約返戻金の計算の基礎としても関係する。"},
+{id:"g08",cat:0,type:"tf",q:"解約返戻金は、どの保険種類であっても支払った保険料と同額が払い戻される。",a:"×",
+ conclusion:"誤り。",reason:"解約返戻金の額は保険種類や経過年数によって異なり、多くの場合、払込保険料の総額を下回る。",note:"特に契約初期の解約では、解約返戻金が少額、またはない場合もある。"},
+{id:"g09",cat:0,type:"choice",q:"次のうち、生命保険の保険料の構成要素として適切でないものを選びなさい。",
+ choices:["純保険料","付加保険料","消費税"],a:2,
+ conclusion:"「消費税」が適切でない。",reason:"生命保険の保険料は純保険料と付加保険料で構成される。",note:"生命保険の保険料には消費税は課されない。"},
+{id:"g10",cat:0,type:"tf",q:"保険料払込猶予期間内に保険料の払い込みがない場合、契約は直ちに無効となる。",a:"×",
+ conclusion:"誤り。",reason:"猶予期間内に払込がなくても直ちに「無効」となるわけではなく、猶予期間経過後に契約が「失効」する。",note:"解約返戻金があれば、自動振替貸付制度により契約が継続する場合がある。"},
+{id:"g11",cat:0,type:"tf",q:"生命保険は、多数の人が保険料を出し合い、万一の際に給付を受ける「相互扶助」の仕組みを基本としている。",a:"○",
+ conclusion:"正しい。",reason:"多数の契約者が保険料を出し合い、万一の際の給付に充てる相互扶助が生命保険の基本的な考え方である。",note:"この仕組みを支えるのが大数の法則と収支相等の原則である。"},
+{id:"g12",cat:0,type:"tf",q:"大数の法則とは、少数の事例からでも将来の発生確率を正確に予測できるという法則である。",a:"×",
+ conclusion:"誤り。",reason:"大数の法則は、観察する数を増やすほど、発生確率が真の確率に近づいていくという法則である。",note:"少数の事例だけでは、確率を正確に予測することはできない。"},
+{id:"g13",cat:0,type:"tf",q:"収支相等の原則とは、保険会社が受け取る保険料総額と、支払う保険金総額等が等しくなるように保険料が計算されるという原則である。",a:"○",
+ conclusion:"正しい。",reason:"保険料は、将来の保険金等の支払総額と収支が均衡するように計算される。",note:"予定死亡率・予定利率・予定事業費率を用いてこの均衡を図る。"},
+{id:"g14",cat:0,type:"choice",q:"生命保険の保険料のうち、保険会社の事業運営に必要な経費に充てられる部分を何というか。",
+ choices:["純保険料","付加保険料","危険保険料"],a:1,
+ conclusion:"「付加保険料」が正しい。",reason:"付加保険料は、保険会社の人件費や物件費などの事業費に充てられる部分である。",note:"保険金等の支払いに充てられるのは純保険料である。"},
+{id:"g15",cat:0,type:"tf",q:"純保険料は、死亡保険金の支払いに充てる「死亡保険料」と、満期保険金等の支払いに充てる「生存保険料」に分けられる。",a:"○",
+ conclusion:"正しい。",reason:"純保険料は保障の性質に応じて死亡保険料と生存保険料に分けて考えられる。",note:"養老保険はこの両方を含む代表的な商品である。"},
+{id:"g16",cat:0,type:"tf",q:"予定死亡率とは、性別・年齢別の統計に基づいて、将来の死亡者数を予測した率のことである。",a:"○",
+ conclusion:"正しい。",reason:"予定死亡率は、性別・年齢別の統計データをもとに将来の死亡者数を予測したものである。",note:"生命表をもとに算出される。"},
+{id:"g17",cat:0,type:"tf",q:"予定事業費率を高く見積もるほど、一般に保険料は安くなる。",a:"×",
+ conclusion:"誤り。",reason:"事業費として見込む部分が大きくなるほど、必要な保険料は高くなる。",note:"予定利率とは逆に、予定事業費率と保険料は同じ方向に動く。"},
+{id:"g18",cat:0,type:"tf",q:"剰余金は、実際の死亡率・利率・事業費率が予定より良好であった場合に生じ、契約者配当の原資となることがある。",a:"○",
+ conclusion:"正しい。",reason:"予定基礎率と実績の差から生じる剰余金は、有配当保険では契約者配当の原資となる。",note:"無配当保険では配当は行われない。"},
+{id:"g19",cat:0,type:"choice",q:"次のうち、「三利源」に含まれないものを選びなさい。",
+ choices:["死差益","利差益","為替差益"],a:2,
+ conclusion:"「為替差益」が含まれない。",reason:"三利源は死差益・利差益・費差益（事業費差益）の3つである。",note:"為替差益は三利源の構成要素ではない。"},
+{id:"g20",cat:0,type:"tf",q:"責任準備金は、保険会社が将来の保険金支払いに備えて積み立てるものであり、保険業法により積立てが義務付けられている。",a:"○",
+ conclusion:"正しい。",reason:"責任準備金の積立ては保険業法上の義務であり、契約者保護の基盤となっている。",note:"解約返戻金の算定にも関係する。"},
+{id:"g21",cat:0,type:"tf",q:"ソルベンシー・マージン比率は、保険会社が保険金等を支払う余力を示す指標の一つである。",a:"○",
+ conclusion:"正しい。",reason:"通常の予測を超えるリスクに対する保険会社の支払余力を示す指標である。",note:"金融庁による早期是正措置の基準にも用いられる。"},
+{id:"g22",cat:0,type:"tf",q:"生命保険は、加入時の健康状態にかかわらず、誰でも同一の保険料で加入できる。",a:"×",
+ conclusion:"誤り。",reason:"一般に健康状態等の危険度に応じて保険料や引受条件が異なる。",note:"危険度の高い場合は、特別条件が付くことや加入できないこともある。"},
+{id:"g23",cat:0,type:"tf",q:"配当金の有無により、生命保険は「有配当保険」と「無配当保険」に分けられる。",a:"○",
+ conclusion:"正しい。",reason:"契約者配当を行う有配当保険と、行わない無配当保険に大別される。",note:"配当の有無は保険料水準にも影響する。"},
+{id:"g24",cat:0,type:"tf",q:"生命保険会社は、株式会社と相互会社のいずれの組織形態でも運営できる。",a:"○",
+ conclusion:"正しい。",reason:"生命保険会社の組織形態には株式会社と相互会社がある。",note:"相互会社は契約者が社員（構成員）となる組織形態である。"},
+{id:"g25",cat:0,type:"choice",q:"生命保険契約者保護機構によるセーフティネットとして、破綻時に責任準備金等の一定割合が補償される。その割合として一般的に説明されるものを選びなさい。",
+ choices:["90%程度","50%程度","100%"],a:0,
+ conclusion:"「90%程度」が一般的に説明される割合である。",reason:"生命保険契約者保護機構は、破綻時に責任準備金等の一定割合（目安として90%程度）を補償する仕組みを持つ。",note:"契約条件によって実際の補償割合は変動し得る。"},
+{id:"g26",cat:0,type:"tf",q:"保険料の払込方法には、月払・半年払・年払・一時払などがある。",a:"○",
+ conclusion:"正しい。",reason:"契約者は複数の払込方法から選ぶことができる。",note:"払込方法によって、猶予期間の長さや保険料総額が異なることがある。"},
+{id:"g27",cat:0,type:"tf",q:"前納は、将来の保険料をまとめて保険会社に預け、各回の払込期日が来るごとに充当していく方法である。",a:"○",
+ conclusion:"正しい。",reason:"前納金は保険会社に預けられ、各期日が来るたびに保険料に充当される。",note:"一時払とは仕組みが異なる。"},
+{id:"g28",cat:0,type:"tf",q:"一時払は、契約時に全保険期間分の保険料を一括で払い込む方法であり、前納とは扱いが異なる。",a:"○",
+ conclusion:"正しい。",reason:"一時払は契約時点で保険料の払込みが完結する方式で、前納のように期日ごとに充当する仕組みとは異なる。",note:"税務上の取り扱いも前納と一時払では異なる場合がある。"},
+{id:"g29",cat:0,type:"tf",q:"転換制度とは、現在契約している保険の責任準備金や積立配当金を新しい契約の一部に充当して契約を見直す制度である。",a:"○",
+ conclusion:"正しい。",reason:"転換制度は、既契約の責任準備金等を新契約の原資の一部として活用する仕組みである。",note:"新規に契約するより保険料負担を抑えられる場合がある。"},
+{id:"g30",cat:0,type:"tf",q:"転換を行う際には、転換後の契約について改めて告知や診査が必要になる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"転換は新たな契約内容を設定するため、告知や診査が必要になることがある。",note:"転換前の契約内容がそのまま引き継がれるわけではない。"},
+{id:"g33",cat:0,type:"tf",q:"保険会社が運用する資産は、安全性・収益性・換金性（流動性）・公共性の4つの原則に従って運用される。",a:"○",
+ conclusion:"正しい。",reason:"保険金支払いの原資となる資産は、この4原則をバランスよく踏まえて運用される必要がある。",note:"収益性だけを追求した運用は行われない。"},
+{id:"g34",cat:0,type:"tf",q:"生命保険会社の資産運用において、公共性は考慮する必要がなく、収益性のみを重視すればよい。",a:"×",
+ conclusion:"誤り。",reason:"資産運用は安全性・収益性・換金性・公共性の4原則をバランスよく踏まえる必要があり、収益性だけを重視するものではない。",note:"契約者から預かった資産であることを踏まえた公共性への配慮が求められる。"},
+{id:"g35",cat:0,type:"tf",q:"保険会社は、保険金の支払いが集中した場合に備え、資産の一部を預貯金や公社債など換金性（流動性）のある形で保有する必要がある。",a:"○",
+ conclusion:"正しい。",reason:"支払いの集中に備え、換金しやすい資産を一定程度保有しておく必要がある。",note:"機動的な資産運用のためにも流動性の確保は重要である。"},
+{id:"g36",cat:0,type:"tf",q:"生命保険会社の資産のうち、土地・建物などの不動産は、自社の営業用のものに限定されており、投資用に保有することは認められていない。",a:"×",
+ conclusion:"誤り。",reason:"不動産は自社の営業用のものに限られるわけではなく、投資用として保有されるものもある。",note:"不動産投資も資産運用の一部として行われる。"},
+{id:"g37",cat:0,type:"tf",q:"相互会社の生命保険に加入した契約者は、原則として社員となり、総代会等を通じて会社運営に関与する立場になる。",a:"○",
+ conclusion:"正しい。",reason:"相互会社の契約者は原則として社員となり、総代会を通じて会社運営上の重要事項の決定に関与する。",note:"株式会社形態とは異なる、相互会社特有の仕組みである。"},
+{id:"g38",cat:0,type:"tf",q:"株式会社形態の生命保険会社に加入した契約者は、契約関係を超えて会社の社員となり、経営に直接参加する。",a:"×",
+ conclusion:"誤り。",reason:"株式会社の場合、契約者は保険の契約関係のみであり、社員として経営に参加するわけではない。",note:"社員として経営に関与するのは相互会社の契約者の特徴である。"},
+{id:"g39",cat:0,type:"tf",q:"配当金を生命保険会社に積み立てておく方法を選択した場合、その積立金は生命保険会社が定める利率により複利で運用されるのが一般的である。",a:"○",
+ conclusion:"正しい。",reason:"積立配当金の運用利率は、生命保険会社が定める利率によるのが一般的である。",note:"保険業法が直接この利率を定めているわけではない点に注意する。"},
+{id:"gm1",cat:0,type:"multi",q:"生命保険の役割・歴史に関する次の記述のうち、誤っているものを2つ選択してください。",
+ choices:["日本で最初の近代的な生命保険会社は、明治時代に設立された。","生命保険は、万一の際の経済的な保障を通じて、公的保障を補完する役割を担っている。","近年は単独世帯の増加等を背景に、経済生活の備えを自分自身の責任で準備すべきという自己責任意識は弱まっている。","貯蓄は「万一の際に不足分を大きな保障で補う」制度であり、生命保険は「少しずつ積み立てる」制度であるとされる。"],
+ correct:[2,3],
+ conclusion:"ウ・エが誤り。",reason:"自己責任意識は弱まっているのではなく、単独世帯の増加等を背景にますます強くなっているとされる。また、貯蓄と保険の一般的な対比は本問の記述と逆で、貯蓄は「三角形」（少しずつ積み立てる）、保険は「四角形」（万一の際に大きな保障で不足分を補う）と説明されることが多い。",note:"ア・イは一般的に正しいとされる記述である。"},
+{id:"g40",cat:0,type:"tf",q:"基礎利益とは、生命保険会社の1年間の保険本業の収益力を示す指標の一つで、一般の事業会社の営業利益や銀行の業務純益に近いものである。",a:"○",
+ conclusion:"正しい。",reason:"基礎利益は、保険本業の収益力を示す代表的な経営指標である。",note:"ソルベンシー・マージン比率とあわせて、経営の健全性を示す指標として説明されることが多い。"},
+{id:"g41",cat:0,type:"choice",q:"ソルベンシー・マージン比率がある基準を下回った場合、早期是正措置の対象となる。その基準として正しいものを選びなさい。",
+ choices:["200%","300%","400%"],a:0,
+ conclusion:"「200%」が正しい。",reason:"ソルベンシー・マージン比率が200%を下回ると、早期に経営の健全性を回復するための早期是正措置の対象となる。",note:"通常の予測を超えて発生するリスクへの支払余力を示す指標である。"},
+{id:"gm2",cat:0,type:"multi",q:"剰余金と配当金に関する次の記述のうち、誤っているものを2つ選択してください。",
+ choices:["生命保険の配当金は、契約者から預かった保険料をもとに保険会社が収支決算した結果生じる剰余金を、契約者に還元するものである。","剰余金が生まれる原因は、死差益・利差益・費差益の3つに分類される。","配当金を保険会社に積み立てておく方法を選んだ場合、その積立金には利息が一切付かない。","無配当保険は、有配当保険よりも将来の配当を見込んで保険料が高く設定されている。"],
+ correct:[2,3],
+ conclusion:"ウ・エが誤り。",reason:"配当金の積立金には生命保険会社が定める利率による利息が付くのが一般的であり、無配当保険はそもそも配当を見込まないため、その分保険料は有配当保険より割安に設定されるのが一般的である。",note:"ア・イは一般的に正しいとされる記述である。"},
+
+// 2. 保険約款・契約手続き
+{id:"k01",cat:1,type:"tf",q:"生命保険の契約は、契約者の申込み、保険会社の承諾、第一回保険料（充当金）の払い込みがそろうことで責任開始期が始まるのが一般的である。",a:"○",
+ conclusion:"正しい。",reason:"申込み・告知（診査）・第一回保険料払込みの3つがそろった時点を基準に責任開始期が定められるのが通常である。",note:"3要素のうち最後に満たされた日が起算日となる。"},
+{id:"k02",cat:1,type:"tf",q:"告知義務とは、保険会社が契約者に対して契約内容を説明する義務のことである。",a:"×",
+ conclusion:"誤り。",reason:"告知義務は、契約者・被保険者が保険会社に対し、健康状態や職業など重要な事項をありのまま告げる義務である。",note:"保険会社側の説明義務とは方向が逆であることに注意する。"},
+{id:"k03",cat:1,type:"tf",q:"生命保険契約のクーリング・オフは、原則として、クーリング・オフに関する書面を受け取った日と申込みをした日のいずれか遅い日から8日以内であれば行使できる。",a:"○",
+ conclusion:"正しい。",reason:"申込みの撤回等ができる期間は、原則としていずれか遅い日から8日以内と定められている。",note:"保険期間1年以下の契約など、クーリング・オフの対象外となる場合もある。"},
+{id:"k04",cat:1,type:"tf",q:"責任開始期前に発生した事故による死亡は、保険金支払いの対象となる。",a:"×",
+ conclusion:"誤り。",reason:"責任開始期が始まる前に生じた事故や疾病は、原則として保障の対象外である。",note:"申込みだけでは保障は始まらず、責任開始期の到来が必要である。"},
+{id:"k05",cat:1,type:"tf",q:"契約が失効した場合でも、一定期間内であれば「復活」の手続きにより契約を元の状態に戻せる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"失効から一定期間内であれば、復活の手続きにより契約を有効な状態に戻せる制度がある。",note:"復活には未払保険料の払い込みなどの条件が伴う。"},
+{id:"k06",cat:1,type:"tf",q:"復活の際には、健康状態についての告知や診査が改めて必要になることがある。",a:"○",
+ conclusion:"正しい。",reason:"復活時点の健康状態を保険会社が確認するため、告知や診査が必要になる場合がある。",note:"失効期間中に健康状態が悪化していると、復活できないこともある。"},
+{id:"k07",cat:1,type:"choice",q:"次のうち、保険契約の「保全」に関する手続きに該当しないものを選びなさい。",
+ choices:["契約者貸付","名義変更","新規申込み"],a:2,
+ conclusion:"「新規申込み」が該当しない。",reason:"新規申込みは新たな契約の締結行為であり、既契約の維持・変更を行う保全手続きではない。",note:"契約者貸付・名義変更・住所変更・特約の中途付加などが保全の代表例である。"},
+{id:"k08",cat:1,type:"tf",q:"契約者貸付制度は、解約返戻金の一定範囲内で保険会社から資金を借り入れられる制度である。",a:"○",
+ conclusion:"正しい。",reason:"解約返戻金の一定割合の範囲内で契約者が資金を借り入れられる制度である。",note:"借入金には所定の利息が付き、返済しない場合は保険金等から差し引かれる。"},
+{id:"k09",cat:1,type:"tf",q:"自動振替貸付制度は、保険料の払込みがない場合に、解約返戻金の範囲内で保険会社が保険料を立て替える制度である。",a:"○",
+ conclusion:"正しい。",reason:"猶予期間内に保険料の払込みがない場合、解約返戻金を原資として保険料を自動的に立て替える制度である。",note:"解約返戻金がない、または不足する場合は適用されず契約が失効することがある。"},
+{id:"k10",cat:1,type:"tf",q:"被保険者が自殺した場合、契約日または復活日からいつであっても死亡保険金は支払われない。",a:"×",
+ conclusion:"誤り。",reason:"一般に契約日・復活日から一定期間（多くの約款で3年程度）を経過した後の自殺は、死亡保険金の支払対象となる。",note:"免責期間の年数は保険会社・商品ごとの約款で定められている。"},
+{id:"k11",cat:1,type:"tf",q:"保険約款とは、保険契約の内容を定めた規定であり、契約者と保険会社との間の権利義務を定めている。",a:"○",
+ conclusion:"正しい。",reason:"約款は契約内容・権利義務関係を定める基本ルールである。",note:"契約者には「契約のしおり・約款」として交付される。"},
+{id:"k12",cat:1,type:"tf",q:"診査扱いとは、医師の診査を受けずに、告知書の記入のみで契約する方法である。",a:"×",
+ conclusion:"誤り。",reason:"医師の診査を受けずに告知書のみで契約する方法は「告知書扱い」であり、医師の診査を受ける方法が「診査扱い」である。",note:"保険金額や年齢等の基準により、いずれの扱いになるかが決まる。"},
+{id:"k13",cat:1,type:"tf",q:"契約のしおり・約款は、契約者に交付することが求められる重要な書類である。",a:"○",
+ conclusion:"正しい。",reason:"契約内容を契約者が理解できるよう、契約のしおり・約款の交付が求められている。",note:"重要事項の理解を助ける役割を持つ。"},
+{id:"k14",cat:1,type:"choice",q:"契約者が保険会社に対して契約内容の変更等を申し出る手続きを総称して何というか。",
+ choices:["保全","復活","失効"],a:0,
+ conclusion:"「保全」が正しい。",reason:"契約者貸付、名義変更、保険金額の変更など、既契約を維持・変更する手続きを保全という。",note:"復活・失効は契約の有効・無効の状態に関する用語である。"},
+{id:"k15",cat:1,type:"tf",q:"契約者は、保険期間の途中で保険金額を減額することができる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"保険料負担の見直し等のため、契約者は保険金額の減額を申し出られる場合がある。",note:"減額部分は解約として扱われることが多い。"},
+{id:"k16",cat:1,type:"tf",q:"契約者貸付を利用した場合、貸付金とその利息が解約返戻金を上回っても、契約は継続する。",a:"×",
+ conclusion:"誤り。",reason:"貸付金と利息の合計が解約返戻金を上回ると、契約が失効することがある。",note:"貸付を利用する際は、返済計画にも注意が必要である。"},
+{id:"k17",cat:1,type:"tf",q:"保険金の請求には、時効（消滅時効）が定められている。",a:"○",
+ conclusion:"正しい。",reason:"保険金請求権には消滅時効が定められており、一定期間を過ぎると請求できなくなることがある。",note:"請求手続きは早めに行うことが望ましい。"},
+{id:"k18",cat:1,type:"tf",q:"被保険者の同意なく、契約者が自由に死亡保険金受取人を変更できる場合がある。",a:"×",
+ conclusion:"誤り。",reason:"死亡保険金受取人の変更には、被保険者の同意が必要とされる。",note:"被保険者保護の観点から設けられているルールである。"},
+{id:"k19",cat:1,type:"tf",q:"契約者と被保険者が異なる契約（他人の生命の保険）を締結する場合、被保険者の同意が必要である。",a:"○",
+ conclusion:"正しい。",reason:"被保険者本人の意思を確認するため、契約締結時に被保険者の同意が必要とされる。",note:"モラルリスク防止の観点からも重要な手続きである。"},
+{id:"k20",cat:1,type:"tf",q:"告知は、募集人に口頭で伝えれば、告知書への記入がなくても法律上有効な告知として扱われる。",a:"×",
+ conclusion:"誤り。",reason:"告知は所定の告知書等、保険会社が指定する方法で行う必要があり、募集人への口頭説明だけでは告知としての効力が認められない場合がある。",note:"募集人には告知受領権が原則としてない点に注意する。"},
+{id:"k21",cat:1,type:"tf",q:"告知義務違反があった場合、保険会社は契約を解除できることがある。",a:"○",
+ conclusion:"正しい。",reason:"重要な事項について事実と異なる告知をした場合、保険会社は契約を解除できることがある。",note:"解除の場合、既払込保険料の扱いは約款の定めによる。"},
+{id:"k22",cat:1,type:"tf",q:"告知義務違反による解除は、保険会社がその事実を知った時から一定期間が経過すると行えなくなる。",a:"○",
+ conclusion:"正しい。",reason:"解除権の行使には期間制限があり、一定期間を過ぎると解除できなくなる。",note:"契約者の地位を過度に不安定にしないための制限である。"},
+{id:"k23",cat:1,type:"choice",q:"保険会社が契約の申込みに対して承諾しない場合の対応として適切なものを選びなさい。",
+ choices:["強制的に契約を締結させる","承諾しない理由にかかわらず必ず契約を成立させる","承諾しないことがある"],a:2,
+ conclusion:"「承諾しないことがある」が正しい。",reason:"保険会社は引受基準等に基づき、申込みを承諾しないことがある。",note:"承諾するかどうかは保険会社の審査による。"},
+{id:"k24",cat:1,type:"tf",q:"特約は、主契約の保険期間満了とともに消滅するのが一般的である。",a:"○",
+ conclusion:"正しい。",reason:"特約は主契約に付加されているため、主契約の保険期間満了に伴い消滅するのが一般的である。",note:"特約ごとに独自の保険期間が設定される場合もある。"},
+{id:"k25",cat:1,type:"tf",q:"契約者は、保険会社の承諾を得ずに、いつでも自由に契約者を変更できる。",a:"×",
+ conclusion:"誤り。",reason:"契約者変更には保険会社への通知・手続きが必要である。",note:"契約者変更は保全手続きの一つとして扱われる。"},
+{id:"k26",cat:1,type:"tf",q:"保険金受取人が死亡保険金の請求前に死亡した場合、その法定相続人が請求できることがある。",a:"○",
+ conclusion:"正しい。",reason:"受取人が請求前に死亡した場合、受取人の法定相続人が請求できることがある。",note:"約款の定めや状況により取り扱いが異なる場合がある。"},
+{id:"k27",cat:1,type:"tf",q:"猶予期間は、保険料の払込方法（月払・半年払・年払）によって長さが異なるのが一般的である。",a:"○",
+ conclusion:"正しい。",reason:"払込方法によって猶予期間の長さが異なるのが一般的である。",note:"月払は比較的短く、年払は比較的長い猶予期間が設定されることが多い。"},
+{id:"k28",cat:1,type:"tf",q:"復活の際に必要な保険料は、失効期間中の保険料を含めて一括で払い込むのが一般的である。",a:"○",
+ conclusion:"正しい。",reason:"復活の際は、失効期間中の未払保険料をまとめて払い込む必要があるのが一般的である。",note:"延滞利息が発生する場合もある。"},
+{id:"k29",cat:1,type:"tf",q:"契約の失効後、復活の手続きを行わなければ、いつまでも自動的に契約は有効なままである。",a:"×",
+ conclusion:"誤り。",reason:"失効後は復活等の手続きをしない限り、契約が有効な状態に戻ることはない。",note:"復活には期限が定められている。"},
+{id:"k30",cat:1,type:"tf",q:"保険証券は、契約成立後に契約者へ交付される、契約内容を示す証書である。",a:"○",
+ conclusion:"正しい。",reason:"保険証券は契約成立を証明し、契約内容を示す書類として契約者に交付される。",note:"紛失した場合は再発行の手続きが必要になる。"},
+{id:"k31",cat:1,type:"choice",q:"生命保険会社が契約を選択（引受査定）する際に把握するべき3つの危険として適切でないものを選びなさい。",
+ choices:["身体上の危険","道徳上の危険（モラルリスク）","為替変動上の危険"],a:2,
+ conclusion:"「為替変動上の危険」が適切でない。",reason:"契約の選択で把握すべき3つの危険は、身体上の危険・環境上の危険・道徳上の危険（モラルリスク）である。",note:"為替変動上の危険は外貨建保険等の商品リスクの話であり、引受査定の3危険とは異なる。"},
+{id:"k32",cat:1,type:"tf",q:"道徳上の危険（モラルリスク）とは、生命保険を利用して不正に利得しようとする心理から、保険に加入しようとする傾向のことをいう。",a:"○",
+ conclusion:"正しい。",reason:"モラルリスクは、不正な利得を目的として保険を利用しようとする心理的傾向を指す。",note:"契約選択における重要な確認事項の一つである。"},
+{id:"k33",cat:1,type:"tf",q:"契約の選択の結果、危険度に応じて割増保険料や特定部位の不担保などの条件を付けて契約することを「特別条件付契約」という。",a:"○",
+ conclusion:"正しい。",reason:"引受査定の結果に応じて、条件を付けたうえで契約を引き受ける仕組みを特別条件付契約という。",note:"無条件での引受が難しい場合でも、条件次第で契約できることがある。"},
+{id:"k34",cat:1,type:"tf",q:"生命保険協会は、契約引受時のモラルリスク対策として、健康情報登録制度を管理・運営している。",a:"○",
+ conclusion:"正しい。",reason:"モラルリスク対策の一環として、業界共通の健康情報登録制度が運営されている。",note:"契約内容照会制度とあわせて、不適切な重複加入等の防止に役立てられる。"},
+{id:"k35",cat:1,type:"tf",q:"払済保険とは、保険料の払い込みを中止し、その時点の解約返戻金をもとに、元の契約と同じ保険期間で保障内容を見直した保険に切り換えるものである。",a:"○",
+ conclusion:"正しい。",reason:"払済保険は、保険期間を変えずに、その時点の解約返戻金をもとに保障内容を見直す仕組みである。",note:"一般に保険金額は元の契約より小さくなる。"},
+{id:"k36",cat:1,type:"tf",q:"払済保険や延長（定期）保険に切り換えた場合、元の契約に付加されていた各種特約は、原則としてそのまま継続する。",a:"×",
+ conclusion:"誤り。",reason:"払済保険・延長保険への変更に伴い、原則として元契約の特約部分は消滅する。",note:"主契約の設計自体が変わるため、特約もあわせて見直される。"},
+{id:"k37",cat:1,type:"tf",q:"延長（定期）保険とは、保険料の払い込みを中止し、その時点の解約返戻金をもとに、元の保険金額を変えずに保険期間を短くした定期保険に切り換えるものである。",a:"○",
+ conclusion:"正しい。",reason:"延長保険は、保険金額を変えずに、解約返戻金の範囲で保険期間を定期保険として設定し直す仕組みである。",note:"払済保険とは、保険金額と保険期間のどちらを維持するかという点で異なる。"},
+{id:"k38",cat:1,type:"tf",q:"契約者貸付を利用している契約でも、貸付を受けていない契約と同様に配当金が支払われる。",a:"○",
+ conclusion:"正しい。",reason:"契約者貸付の利用は配当金の支払い自体には影響しないのが一般的である。",note:"ただし貸付金とその利息は、将来の保険金等から差し引かれる。"},
+{id:"k39",cat:1,type:"tf",q:"死亡保険金受取人が故意に被保険者を死亡させた場合、死亡保険金は支払われないが、受取人が複数いる場合、他の受取人へは残額が支払われることがある。",a:"○",
+ conclusion:"正しい。",reason:"故意に死亡させた受取人への支払いはないが、他に受取人がいる場合はその残額が支払われることがある。",note:"約款上の代表的な免責事由の一つである。"},
+{id:"k40",cat:1,type:"tf",q:"契約者が故意に被保険者を死亡させた場合であっても、死亡保険金は通常どおり支払われる。",a:"×",
+ conclusion:"誤り。",reason:"契約者の故意による死亡の場合も、死亡保険金は支払われないのが原則である。",note:"受取人の故意による場合と同様、約款上の免責事由とされる。"},
+{id:"k41",cat:1,type:"tf",q:"戦争その他の変乱によって被保険者が死亡した場合、死亡した被保険者の数にかかわらず、死亡保険金は常に全額支払われる。",a:"×",
+ conclusion:"誤り。",reason:"戦争その他の変乱による死亡は、死亡した被保険者の数等の状況により、死亡保険金が全額または削減して支払われる、あるいは支払われないことがある。",note:"「常に全額支払われる」という部分が誤りである。"},
+{id:"k42",cat:1,type:"tf",q:"新契約時の保険料が50,000円以上のときは、第1回保険料（充当金）領収証に200円の収入印紙をはって取扱者の割印を押す。",a:"○",
+ conclusion:"正しい。",reason:"50,000円以上の新契約保険料に対しては、200円の収入印紙を貼付し割印を押す取り扱いとなっている。",note:"金額基準を下回る場合は収入印紙の貼付は不要である。"},
+{id:"k43",cat:1,type:"tf",q:"収入印紙の金額として、新契約時の保険料が30,000円以上のときに貼付する「100円の収入印紙」という区分が存在する。",a:"×",
+ conclusion:"誤り。",reason:"100円の収入印紙という区分は存在せず、50,000円以上の場合に200円の収入印紙を貼付する。",note:"金額の混同に注意が必要な論点である。"},
+
+// 3. 保険募集のルール・コンプライアンス
+{id:"c01",cat:2,type:"tf",q:"生命保険募集人は、顧客に対して契約締結前に「契約概要」と「注意喚起情報」を記載した書面を交付しなければならない。",a:"○",
+ conclusion:"正しい。",reason:"契約内容の理解と適切な判断のため、契約概要・注意喚起情報を記載した書面の交付が求められている。",note:"書面交付は募集プロセスにおける基本的な顧客保護の仕組みである。"},
+{id:"c02",cat:2,type:"tf",q:"意向把握・意向確認は、顧客の意向に沿った商品を提案し、契約後に意向と合致しているかを確認するための重要なプロセスである。",a:"○",
+ conclusion:"正しい。",reason:"顧客の意向に沿わない契約を防ぐため、意向把握・意向確認のプロセスが重視されている。",note:"意向確認書面などにより、顧客自身が確認できる形にすることが求められる。"},
+{id:"c03",cat:2,type:"tf",q:"募集人は、顧客の不利益になる場合であっても、既契約を消滅させて新たな契約に乗り換えさせることを積極的に勧めてよい。",a:"×",
+ conclusion:"誤り。",reason:"顧客に不利益を与える不適切な乗換募集は禁止されている。",note:"乗換えを行う場合は、比較情報の提供など顧客保護の手続きが必要である。"},
+{id:"c04",cat:2,type:"tf",q:"高齢者に対する保険募集では、家族の同席や複数回の面談など、通常より慎重な対応が求められる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"判断力の状況等に配慮し、高齢者向けには通常より慎重な募集プロセスが求められることがある。",note:"各社の社内規程で年齢基準や具体的な対応方法が定められている。"},
+{id:"c05",cat:2,type:"choice",q:"次のうち、募集人に禁止されている行為として適切なものを選びなさい。",
+ choices:["重要事項の説明","断定的判断の提供","意向確認書面の交付"],a:1,
+ conclusion:"「断定的判断の提供」が禁止行為に該当する。",reason:"将来の運用成果など不確実な事項について断定的な判断を示す行為は禁止されている。",note:"重要事項の説明や意向確認書面の交付はむしろ募集人に求められる行為である。"},
+{id:"c06",cat:2,type:"tf",q:"比較推奨販売を行う場合、募集人は顧客に対して比較の対象や理由を明確に説明する必要がある。",a:"○",
+ conclusion:"正しい。",reason:"複数商品を比較して推奨する際は、比較の基準や理由を顧客に分かるように説明する必要がある。",note:"恣意的な比較や説明不足は不適切な募集とされる。"},
+{id:"c07",cat:2,type:"tf",q:"募集人は自身の販売実績を上げるため、顧客の意向にかかわらず特定の商品のみを勧めることが推奨されている。",a:"×",
+ conclusion:"誤り。",reason:"顧客本位の業務運営の観点から、顧客の意向を無視した特定商品の推奨は適切でない。",note:"募集人の利益より顧客の利益を優先する姿勢が求められる。"},
+{id:"c08",cat:2,type:"tf",q:"反社会的勢力との関係が疑われる人物から申込みがあった場合でも、募集人は通常どおり契約手続きを進めなければならない。",a:"×",
+ conclusion:"誤り。",reason:"反社会的勢力との取引を排除する必要があり、通常どおり手続きを進めてはならない。",note:"疑わしい場合は所定の手続きに従い、上長や管理部門へ報告・確認する。"},
+{id:"c09",cat:2,type:"tf",q:"募集人は、顧客の同意を得ずに他の生命保険会社の非公開情報を利用して勧誘してよい。",a:"×",
+ conclusion:"誤り。",reason:"顧客情報や他社の非公開情報を不適切に利用する行為は禁止されている。",note:"個人情報の取扱いは、個人情報保護法や社内規程にも従う必要がある。"},
+{id:"c10",cat:2,type:"tf",q:"生命保険協会は、募集人の資質向上のため一般課程・専門課程などの教育制度を設けている。",a:"○",
+ conclusion:"正しい。",reason:"生命保険協会は業界共通の教育制度として一般課程・専門課程等の各種試験を実施している。",note:"一般課程は募集人登録の前提として位置づけられている。"},
+{id:"c11",cat:2,type:"tf",q:"募集人は、生命保険協会が定める倫理規定やコンプライアンスに関するルールを遵守する必要がある。",a:"○",
+ conclusion:"正しい。",reason:"業界共通の倫理規定やコンプライアンスルールの遵守が募集人に求められる。",note:"所属保険会社独自の社内規程も併せて遵守する必要がある。"},
+{id:"c12",cat:2,type:"tf",q:"募集人は、顧客との面談内容を記録し、後から確認できるようにしておくことが望ましいとされている。",a:"○",
+ conclusion:"正しい。",reason:"募集プロセスの適正性を確認できるよう、面談記録の保管が望ましいとされる。",note:"トラブル発生時の重要な確認資料にもなる。"},
+{id:"c13",cat:2,type:"choice",q:"顧客に対して契約の必要性を判断するための基本的な情報提供を行う募集人の行為を何というか。",
+ choices:["情報提供義務の履行","目論見書の交付","適合性の原則の放棄"],a:0,
+ conclusion:"「情報提供義務の履行」が正しい。",reason:"顧客が契約の必要性を判断できるよう、必要な情報を提供することが求められている。",note:"目論見書は主に投資信託等で用いられる書類である。"},
+{id:"c14",cat:2,type:"tf",q:"募集人は、自らが所属する保険会社の商品のみを説明すればよく、他社商品との比較を求められても一切応じてはならない。",a:"×",
+ conclusion:"誤り。",reason:"比較推奨販売を行う場合は、比較の対象や理由を適切に説明することが求められる。全く応じてはならないわけではない。",note:"比較を行う場合は恣意的な説明にならないよう注意が必要である。"},
+{id:"c15",cat:2,type:"tf",q:"生命保険の募集にあたり、事実と異なることを告げる行為（不実告知）は禁止されている。",a:"○",
+ conclusion:"正しい。",reason:"不実告知は顧客の誤った判断を招くため、明確に禁止されている。",note:"断定的判断の提供とあわせて、代表的な禁止行為とされる。"},
+{id:"c16",cat:2,type:"tf",q:"募集人は、顧客の判断に必要な重要な事実を、あえて告げないことが許される場合がある。",a:"×",
+ conclusion:"誤り。",reason:"重要な事実を告げない行為も、不適切な募集として問題になり得る。",note:"不利益事実の不告知も禁止行為に含まれると理解しておく。"},
+{id:"c17",cat:2,type:"tf",q:"生命保険募集人指針は、募集人が守るべき行動の基本的な考え方を示したものである。",a:"○",
+ conclusion:"正しい。",reason:"募集人としての行動規範・基本的な考え方を示す指針である。",note:"各社の教育や社内規程のベースとなる考え方である。"},
+{id:"c18",cat:2,type:"tf",q:"特別利益の提供（保険料の割引や過度な景品の提供等）は、募集上禁止されている。",a:"○",
+ conclusion:"正しい。",reason:"契約者間の公平性を損なうため、特別利益の提供は禁止されている。",note:"景品類の提供にも一定の制限が設けられている。"},
+{id:"c19",cat:2,type:"choice",q:"保険業法において、保険会社・募集人が禁止されている行為として適切でないものを選びなさい。",
+ choices:["虚偽の説明","重要事項の説明","特別利益の提供"],a:1,
+ conclusion:"「重要事項の説明」が禁止行為に該当しない。",reason:"重要事項の説明はむしろ募集人に求められる行為であり、禁止行為ではない。",note:"虚偽の説明・特別利益の提供はいずれも禁止行為である。"},
+{id:"c20",cat:2,type:"tf",q:"苦情対応は、募集人個人の判断だけで完結させず、会社の苦情対応窓口等と連携することが求められる。",a:"○",
+ conclusion:"正しい。",reason:"組織的な対応により、公平かつ適切な解決を図ることが求められる。",note:"個人だけで判断せず、社内の体制を活用することが重要である。"},
+{id:"c21",cat:2,type:"tf",q:"コンプライアンス（法令等遵守）とは、法律だけでなく、社内規則や募集上のルールも含めて遵守することを指す。",a:"○",
+ conclusion:"正しい。",reason:"コンプライアンスは、法令に加えて社内規則・業界ルールの遵守も含む広い概念である。",note:"募集人一人ひとりの行動が会社全体の信頼に影響する。"},
+{id:"c22",cat:2,type:"tf",q:"反社会的勢力排除の取り組みは、保険会社の経営の健全性や信頼性を守るために重要とされている。",a:"○",
+ conclusion:"正しい。",reason:"反社会的勢力との関係遮断は、経営の健全性・社会的信頼の維持に不可欠とされる。",note:"募集人も日常の対応の中でこの姿勢を求められる。"},
+{id:"c23",cat:2,type:"tf",q:"募集人は、顧客の年齢や健康状態にかかわらず、常に同じ説明方法で対応すればよい。",a:"×",
+ conclusion:"誤り。",reason:"高齢者等、顧客の属性に応じた配慮ある対応が求められる。",note:"理解度に応じた説明の工夫が必要である。"},
+{id:"c24",cat:2,type:"tf",q:"募集人資格を持たない者が生命保険の募集を行うことは、法律で禁止されている。",a:"○",
+ conclusion:"正しい。",reason:"募集人としての登録を受けていない者による募集は法律で禁止されている。",note:"無登録募集は重大な違反行為とされる。"},
+{id:"c25",cat:2,type:"tf",q:"意向確認書面は、契約締結後に顧客の意向と契約内容が合致しているかを確認するための書面である。",a:"○",
+ conclusion:"正しい。",reason:"契約内容が顧客の意向に沿ったものであるかを、契約後に確認するための書面である。",note:"意向把握（契約前）と意向確認（契約後）はセットで運用される。"},
+{id:"c26",cat:2,type:"tf",q:"募集人は、顧客から取得した個人情報を、本人の同意なく他の目的に自由に利用してよい。",a:"×",
+ conclusion:"誤り。",reason:"個人情報の目的外利用には、原則として本人の同意が必要である。",note:"個人情報保護法に基づく取扱いが求められる。"},
+{id:"c27",cat:2,type:"tf",q:"生命保険募集人は、募集を行う保険会社ごとに、それぞれ所定の登録を受ける必要がある。",a:"○",
+ conclusion:"正しい。",reason:"複数の保険会社の商品を扱う場合、各社について所定の登録手続きが必要となる。",note:"所属保険会社等の考え方に基づく仕組みである。"},
+{id:"c28",cat:2,type:"tf",q:"経済的合理性を欠く「乗換募集」を行った場合、募集人に対して行政処分等が科される可能性がある。",a:"○",
+ conclusion:"正しい。",reason:"不適切な乗換募集は行政処分等の対象となり得る重大な違反行為である。",note:"乗換えの際は比較情報の提供など所定の手続きが必要である。"},
+{id:"c29",cat:2,type:"tf",q:"募集人は、顧客に対して契約締結を過度に急がせるような勧誘を行ってはならない。",a:"○",
+ conclusion:"正しい。",reason:"顧客が十分に検討・判断できるよう配慮することが求められる。",note:"熟慮期間を軽視する勧誘は不適切とされる。"},
+{id:"c30",cat:2,type:"tf",q:"生命保険協会の教育制度は、募集人の資質向上だけでなく、業界全体の信頼性向上も目的としている。",a:"○",
+ conclusion:"正しい。",reason:"個々の募集人の資質向上を通じて、業界全体の信頼性向上を図ることも目的の一つである。",note:"一般課程試験もこの教育制度の一部である。"},
+{id:"c31",cat:2,type:"choice",q:"募集人が特定の保険会社から募集の委託を受けている場合の、その委託元の保険会社を何というか。",
+ choices:["所属生命保険会社","生命保険契約者保護機構","日本損害保険協会"],a:0,
+ conclusion:"「所属生命保険会社」が正しい。",reason:"募集人は、委託元である所属生命保険会社等のもとで募集活動を行う立場にある。",note:"複数の保険会社の商品を扱う場合、それぞれについて所属関係が生じる。"},
+
+// 4. 保険と税金
+{id:"t01",cat:3,type:"tf",q:"契約者と被保険者が同一人であり、死亡保険金受取人が相続人である場合、死亡保険金は相続税の課税対象となる。",a:"○",
+ conclusion:"正しい。",reason:"契約者＝被保険者のケースで相続人が受け取る死亡保険金は、相続税の課税対象となる。",note:"法定相続人が受け取る場合は、後述の非課税限度額の適用がある。"},
+{id:"t02",cat:3,type:"tf",q:"契約者と保険金受取人が同一人（本人）で、被保険者が別人である場合に受け取る満期保険金は、所得税（一時所得）の課税対象となる。",a:"○",
+ conclusion:"正しい。",reason:"保険料を負担した本人が自ら保険金等を受け取る場合は、所得税（一時所得）の対象となる。",note:"一時所得は他の所得と合算して総合課税される。"},
+{id:"t03",cat:3,type:"tf",q:"契約者・被保険者・保険金受取人がすべて異なる場合に支払われる死亡保険金は、贈与税の課税対象となる。",a:"○",
+ conclusion:"正しい。",reason:"保険料負担者でも被保険者でもない第三者が保険金を受け取る場合は、贈与税の対象となる。",note:"3者の関係によって課税される税目（相続税・所得税・贈与税）が異なる点が重要である。"},
+{id:"t04",cat:3,type:"tf",q:"相続税における生命保険金の非課税限度額は、「500万円×法定相続人の数」で計算される。",a:"○",
+ conclusion:"正しい。",reason:"相続人が受け取る死亡保険金には、500万円×法定相続人の数の非課税限度額が設けられている。",note:"相続人以外が受け取る保険金には、この非課税枠は適用されない。"},
+{id:"t05",cat:3,type:"tf",q:"一般生命保険料控除・介護医療保険料控除・個人年金保険料控除は、それぞれ独立して所得控除の対象となる場合がある（新制度）。",a:"○",
+ conclusion:"正しい。",reason:"平成24年以降の契約に適用される新制度では、3つの区分ごとに保険料控除の枠が設けられている。",note:"区分ごとに控除額の上限があり、合計適用限度額も定められている。"},
+{id:"t06",cat:3,type:"tf",q:"生命保険料控除は、支払った保険料の全額が無条件に所得から控除される。",a:"×",
+ conclusion:"誤り。",reason:"生命保険料控除には区分ごとの上限額があり、支払保険料の全額がそのまま控除されるわけではない。",note:"控除額は支払保険料の金額に応じた計算式によって決まる。"},
+{id:"t07",cat:3,type:"choice",q:"次のうち、一時所得の金額の計算式として正しいものを選びなさい。",
+ choices:["（総収入金額－必要経費）×1/2","（総収入金額－必要経費－特別控除額）×1/2","総収入金額－必要経費"],a:1,
+ conclusion:"「（総収入金額－必要経費－特別控除額）×1/2」が正しい。",reason:"一時所得は、収入金額から支出額と特別控除額（最高50万円）を差し引いた額の2分の1が課税対象となる。",note:"特別控除額を差し引く点、2分の1にする点の両方を忘れないようにする。"},
+{id:"t08",cat:3,type:"tf",q:"個人年金保険料控除の対象となるには、税制適格特約を付加している必要がある。",a:"○",
+ conclusion:"正しい。",reason:"個人年金保険料控除を受けるには、契約に税制適格特約が付加されている必要がある。",note:"特約が付加されていない個人年金は、一般生命保険料控除の対象となる。"},
+{id:"t09",cat:3,type:"tf",q:"災害や疾病により支払われる入院給付金や手術給付金は、原則として非課税である。",a:"○",
+ conclusion:"正しい。",reason:"身体の傷害に起因して支払われる給付金は、原則として非課税とされている。",note:"死亡保険金や満期保険金など、貯蓄性のある給付とは扱いが異なる。"},
+{id:"t10",cat:3,type:"tf",q:"死亡保険金を年金形式で受け取る場合、初年度分も含めてすべて非課税となる。",a:"×",
+ conclusion:"誤り。",reason:"年金形式で受け取る場合、相続税の課税対象となる部分に加え、毎年受け取る年金には雑所得として所得税が課される部分がある。",note:"一時金で受け取る場合と課税関係が異なる点に注意する。"},
+{id:"t11",cat:3,type:"tf",q:"一般生命保険料控除の対象となるのは、主に死亡保障や生存保障を目的とする保険契約の保険料である。",a:"○",
+ conclusion:"正しい。",reason:"死亡・生存を保障する一般的な生命保険の保険料が一般生命保険料控除の対象となる。",note:"医療保障は介護医療保険料控除の対象となる。"},
+{id:"t12",cat:3,type:"tf",q:"介護医療保険料控除の対象となるのは、主に入院・通院給付等、医療保障に関する保険料である。",a:"○",
+ conclusion:"正しい。",reason:"医療保障・介護保障に関する保険料が介護医療保険料控除の対象となる。",note:"平成24年以後の新制度で新設された区分である。"},
+{id:"t13",cat:3,type:"choice",q:"新制度（平成24年1月1日以後の契約）における生命保険料控除の所得税の控除限度額（各区分ごと）として、一般的に説明される金額を選びなさい。",
+ choices:["最高4万円","最高5万円","最高10万円"],a:0,
+ conclusion:"「最高4万円」が正しい。",reason:"新制度では、一般・介護医療・個人年金の各区分について所得税は最高4万円の控除となる。",note:"3区分合計の適用限度額にも上限が設けられている。"},
+{id:"t14",cat:3,type:"tf",q:"契約者と被保険者が異なっていても、契約者が保険料を負担していれば、その契約者本人が生命保険料控除を受けられる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"生命保険料控除は保険料の負担者が受けられるのが基本であり、被保険者が誰かとは別の問題である。",note:"控除を受けるには本人が保険料を支払っていることが前提となる。"},
+{id:"t15",cat:3,type:"tf",q:"死亡保険金を一時金で受け取り、相続税の課税対象となる場合、非課税限度額を超えた部分が課税対象になる。",a:"○",
+ conclusion:"正しい。",reason:"非課税限度額（500万円×法定相続人の数）を超える部分が相続税の課税対象となる。",note:"非課税限度額以下であれば課税されない。"},
+{id:"t16",cat:3,type:"tf",q:"相続放棄をした人が受け取る死亡保険金にも、相続税の非課税限度額（500万円×法定相続人の数）が適用される。",a:"×",
+ conclusion:"誤り。",reason:"相続放棄をした人は、この非課税規定の適用を受けられないとされる。",note:"保険金自体は受取人固有の財産として受け取れるが、非課税枠は使えない。"},
+{id:"t17",cat:3,type:"tf",q:"満期保険金を年金形式で受け取る個人年金保険は、原則として雑所得として所得税の課税対象となる。",a:"○",
+ conclusion:"正しい。",reason:"年金形式で受け取る個人年金保険は、原則として雑所得として所得税の対象となる。",note:"契約形態によっては贈与税が絡む場合もある。"},
+{id:"t18",cat:3,type:"tf",q:"契約者と保険金受取人が異なる場合の満期保険金は、贈与税の課税対象となることがある。",a:"○",
+ conclusion:"正しい。",reason:"保険料を負担していない受取人が満期保険金を受け取る場合は、贈与税の対象となることがある。",note:"契約者・被保険者・受取人の関係によって課税関係が変わる。"},
+{id:"t19",cat:3,type:"tf",q:"高度障害保険金は、原則として非課税で受け取ることができる。",a:"○",
+ conclusion:"正しい。",reason:"高度障害保険金は身体の重大な障害に対する給付であり、原則として非課税とされる。",note:"入院給付金等と同様の考え方に基づく。"},
+{id:"t20",cat:3,type:"tf",q:"解約返戻金を受け取った場合、受取額が払込保険料を上回る部分は一時所得として課税対象となることがある。",a:"○",
+ conclusion:"正しい。",reason:"解約返戻金が払込保険料を上回る場合、その差益は一時所得として課税対象になり得る。",note:"上回らない場合は課税関係が生じないのが通常である。"},
+{id:"t21",cat:3,type:"choice",q:"契約者・被保険者・保険金受取人がすべて同一人（本人）である個人年金保険で、年金受取時に課税される税目として適切なものを選びなさい。",
+ choices:["相続税","贈与税","所得税（雑所得）"],a:2,
+ conclusion:"「所得税（雑所得）」が正しい。",reason:"契約者本人が保険料を負担し、自ら年金を受け取る場合は所得税（雑所得）の対象となる。",note:"相続税・贈与税は、保険料負担者と受取人が異なる場合に関係する。"},
+{id:"t22",cat:3,type:"tf",q:"法人が契約者となる生命保険契約は、個人契約とは異なる税務上の取り扱いがなされる。",a:"○",
+ conclusion:"正しい。",reason:"法人契約では、保険料の損金・資産計上等、個人契約とは異なる税務処理が行われる。",note:"一般課程では概要レベルの理解で十分である。"},
+{id:"t23",cat:3,type:"tf",q:"生命保険料控除の対象となるためには、保険期間が5年以上であることが常に必要である。",a:"×",
+ conclusion:"誤り。",reason:"保険期間の長さだけで一律に判定されるわけではなく、保険の種類や契約内容によって取り扱いが異なる。",note:"個々の商品の適用条件を確認する必要がある。"},
+{id:"t24",cat:3,type:"tf",q:"相続税の申告が必要な場合、生命保険金は「みなし相続財産」として相続税の課税対象に含まれる。",a:"○",
+ conclusion:"正しい。",reason:"死亡保険金は民法上の相続財産ではないが、税法上は「みなし相続財産」として課税対象に含まれる。",note:"非課税限度額の範囲内であれば課税されない。"},
+{id:"t25",cat:3,type:"tf",q:"生前贈与された金銭で契約者が保険料を負担し、契約者・受取人が贈与を受けた本人である場合、その保険から生じる収入は原則として贈与税ではなく所得税等の対象になり得る。",a:"○",
+ conclusion:"正しい。",reason:"保険料を負担した本人が自ら保険金等を受け取る場合は、原則として所得税（一時所得等）の対象となる。",note:"贈与を受けた時点では別途贈与税の検討が必要になる場合がある。"},
+{id:"t26",cat:3,type:"tf",q:"災害割増特約に基づく災害死亡保険金は、通常の死亡保険金と課税上の扱いが全く異なり、常に非課税である。",a:"×",
+ conclusion:"誤り。",reason:"災害死亡保険金も基本的には通常の死亡保険金と同様の課税関係（相続税・所得税・贈与税のいずれか）に従う。",note:"「常に非課税」というのは誤りである。"},
+{id:"t27",cat:3,type:"tf",q:"個人年金保険料控除・一般生命保険料控除・介護医療保険料控除は、それぞれ別枠で申告できるため、合計での控除額を大きくできる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"3つの区分はそれぞれ別枠として計算されるため、合計での控除額が大きくなる場合がある。",note:"ただし合計適用限度額の上限には注意が必要である。"},
+{id:"t28",cat:3,type:"tf",q:"年末調整や確定申告の際には、保険会社から送付される生命保険料控除証明書の添付が必要である。",a:"○",
+ conclusion:"正しい。",reason:"控除の適用を受けるには、保険会社発行の証明書の提出・添付が必要である。",note:"証明書は毎年秋頃に送付されるのが一般的である。"},
+{id:"t29",cat:3,type:"tf",q:"契約者貸付金を利用しても、それ自体が直ちに課税対象になることはない。",a:"○",
+ conclusion:"正しい。",reason:"契約者貸付は解約返戻金を担保とした借入れであり、借入れ自体は課税対象とならない。",note:"ただし将来の保険金等の受取額に影響することがある。"},
+{id:"t30",cat:3,type:"tf",q:"相続税の非課税限度額（500万円×法定相続人の数）は、受け取った保険金額にかかわらず、常に全額が非課税となる。",a:"×",
+ conclusion:"誤り。",reason:"非課税限度額を超える部分は課税対象となる。",note:"「常に全額非課税」というのは誤りである。"},
+{id:"t31",cat:3,type:"tf",q:"消費者契約法は、消費者契約の対象を広く定めており、生命保険契約もその対象に含まれる。",a:"○",
+ conclusion:"正しい。",reason:"消費者契約法の対象は幅広く、生命保険契約も対象に含まれる。",note:"「保険契約は対象外」という説明は誤りなので注意する。"},
+{id:"t32",cat:3,type:"choice",q:"配偶者と子が法定相続人となる場合、配偶者の法定相続分として正しいものを選びなさい。",
+ choices:["1/2","2/3","3/4"],a:0,
+ conclusion:"「1/2」が正しい。",reason:"配偶者と子が相続人の場合、配偶者の法定相続分は1/2、子の法定相続分は残りの1/2である。",note:"民法上の法定相続分の基本パターンの一つである。"},
+{id:"t33",cat:3,type:"choice",q:"配偶者と直系尊属（父母等）が法定相続人となる場合、配偶者の法定相続分として正しいものを選びなさい。",
+ choices:["1/2","2/3","3/4"],a:1,
+ conclusion:"「2/3」が正しい。",reason:"配偶者と直系尊属が相続人の場合、配偶者の法定相続分は2/3、直系尊属の法定相続分は1/3である。",note:"子がいない場合に適用されるパターンである。"},
+{id:"t34",cat:3,type:"choice",q:"配偶者と兄弟姉妹が法定相続人となる場合、配偶者の法定相続分として正しいものを選びなさい。",
+ choices:["1/2","2/3","3/4"],a:2,
+ conclusion:"「3/4」が正しい。",reason:"配偶者と兄弟姉妹が相続人の場合、配偶者の法定相続分は3/4、兄弟姉妹の法定相続分は1/4である。",note:"子・直系尊属がいずれもいない場合に適用されるパターンである。"},
+{id:"t35",cat:3,type:"tf",q:"生命保険料控除により軽減されるのは所得税のみであり、住民税は軽減の対象とならない。",a:"×",
+ conclusion:"誤り。",reason:"生命保険料控除は所得税だけでなく住民税も軽減の対象となる。",note:"所得税と住民税とでは、区分ごとの控除限度額が異なる。"},
+{id:"t36",cat:3,type:"tf",q:"犯罪収益移転防止法上、現金送金時の取引時確認が必要となる金額の目安は「10万円超」である。",a:"○",
+ conclusion:"正しい。",reason:"現金送金時の取引時確認が必要となる金額の目安は10万円超とされる。",note:"大口現金取引時の目安（200万円超）とは金額が異なる点に注意する。"},
+{id:"t37",cat:3,type:"tf",q:"犯罪収益移転防止法上の大口現金取引の取引時確認が必要となる金額の目安は「200万円超」である。",a:"○",
+ conclusion:"正しい。",reason:"大口現金取引時の取引時確認が必要となる金額の目安は200万円超とされる。",note:"現金送金時の目安（10万円超）と混同しないよう注意する。"},
+
+// 5. 関連法規（保険業法等）
+{id:"h01",cat:4,type:"tf",q:"保険業法は、保険会社の業務の健全かつ適切な運営を確保し、保険契約者等の保護を図ることを目的の一つとしている。",a:"○",
+ conclusion:"正しい。",reason:"保険業法は保険会社の健全性確保と契約者保護を主な目的として定められている。",note:"募集ルールや登録制度も、この目的を実現するための仕組みである。"},
+{id:"h02",cat:4,type:"tf",q:"保険法は、保険契約者等の保護よりも保険会社の経営の自由を優先する目的で制定された。",a:"×",
+ conclusion:"誤り。",reason:"保険法は保険契約に関する一般的なルールを定め、契約当事者間の権利義務を適切に規律することを目的としている。",note:"保険業法（業者に対する規制）と保険法（契約に関するルール）の違いを区別しておく。"},
+{id:"h03",cat:4,type:"tf",q:"生命保険募集人は、内閣総理大臣（金融庁）の登録を受けなければ募集を行うことができない。",a:"○",
+ conclusion:"正しい。",reason:"生命保険募集人として活動するには、法律に基づく登録が必要である。",note:"一般課程試験の合格は、この登録手続きの前提となることが多い。"},
+{id:"h04",cat:4,type:"tf",q:"生命保険契約者保護機構は、生命保険会社が破綻した場合に契約者を保護するための制度である。",a:"○",
+ conclusion:"正しい。",reason:"保険会社の経営破綻時に、契約者の保護を図るための機構として設けられている。",note:"補償の範囲や割合には一定のルールが定められている。"},
+{id:"h05",cat:4,type:"tf",q:"保険会社の業務は、保険業法により定められた業務以外にも自由に行うことができる。",a:"×",
+ conclusion:"誤り。",reason:"保険業法により、保険会社が営むことができる業務の範囲（兼業）は制限されている。",note:"契約者保護と経営の健全性維持のための規制である。"},
+{id:"h06",cat:4,type:"choice",q:"次のうち、金融商品取引法上の「適合性の原則」の説明として適切なものを選びなさい。",
+ choices:["顧客の知識・経験・財産状況・目的に照らして不適当な勧誘を行ってはならない原則","保険料を割り引く原則","契約者を平等に扱う原則"],a:0,
+ conclusion:"「顧客の知識・経験・財産状況・目的に照らして不適当な勧誘を行ってはならない原則」が正しい。",reason:"適合性の原則は、顧客の属性に照らして不適当な勧誘・販売を禁じる考え方である。",note:"変額保険や外貨建て保険など、リスクのある商品の販売で特に重視される。"},
+{id:"h07",cat:4,type:"tf",q:"個人情報保護法上、生命保険募集人は業務上知り得た顧客の個人情報を適切に管理する義務を負う。",a:"○",
+ conclusion:"正しい。",reason:"個人情報保護法に基づき、業務上取得した顧客情報を適切に管理する義務がある。",note:"目的外利用や第三者提供には、原則として本人の同意が必要である。"},
+{id:"h08",cat:4,type:"tf",q:"犯罪収益移転防止法に基づき、保険会社は一定の取引時に本人確認（取引時確認）を行う必要がある。",a:"○",
+ conclusion:"正しい。",reason:"マネー・ローンダリング対策の一環として、一定の取引時に本人確認が義務付けられている。",note:"高額な一時払契約などが取引時確認の対象になりやすい。"},
+{id:"h09",cat:4,type:"tf",q:"保険業法上、募集人が顧客に対して虚偽のことを告げる行為は禁止されている。",a:"○",
+ conclusion:"正しい。",reason:"虚偽説明は募集人の重要な禁止行為の一つとして定められている。",note:"事実に反する説明は、顧客の誤った判断を招くため厳しく規制される。"},
+{id:"h10",cat:4,type:"tf",q:"保険募集人の登録が取り消された場合でも、一定期間はそのまま募集行為を継続できる。",a:"×",
+ conclusion:"誤り。",reason:"登録が取り消された場合、その時点で募集人として活動することはできなくなる。",note:"登録は募集行為を行うための前提条件である。"},
+{id:"h11",cat:4,type:"tf",q:"保険業法上、保険会社は内閣総理大臣（金融庁）の免許を受けて事業を行う。",a:"○",
+ conclusion:"正しい。",reason:"保険業を営むには内閣総理大臣の免許が必要である。",note:"無免許での保険business運営は認められない。"},
+{id:"h12",cat:4,type:"tf",q:"生命保険募集人には、所属保険会社が委託する「所属保険会社等」の考え方がある。",a:"○",
+ conclusion:"正しい。",reason:"募集人は所属保険会社等から委託を受けて募集を行う立場にある。",note:"所属保険会社は募集人の教育・管理について責任を負う。"},
+{id:"h13",cat:4,type:"choice",q:"保険業法における「クーリング・オフ」制度の目的として適切なものを選びなさい。",
+ choices:["契約者に契約撤回の機会を与えること","保険会社の利益を守ること","募集人の実績を守ること"],a:0,
+ conclusion:"「契約者に契約撤回の機会を与えること」が正しい。",reason:"クーリング・オフは、契約者に一定期間内の申込撤回の機会を保障する制度である。",note:"契約者保護の代表的な仕組みの一つである。"},
+{id:"h14",cat:4,type:"tf",q:"保険業法は、生命保険会社だけでなく損害保険会社にも適用される法律である。",a:"○",
+ conclusion:"正しい。",reason:"保険業法は生命保険会社・損害保険会社の両方に適用される法律である。",note:"保険業全体の健全性・契約者保護を目的としている。"},
+{id:"h15",cat:4,type:"tf",q:"保険募集人の登録は、一度受ければ永久に有効であり、更新等の手続きは一切不要である。",a:"×",
+ conclusion:"誤り。",reason:"登録の抹消事由に該当した場合など、継続的な適正性の確保が求められる。",note:"登録内容の変更があれば所定の届出が必要になる。"},
+{id:"h16",cat:4,type:"tf",q:"金融ADR制度（指定紛争解決機関）は、保険契約者と保険会社との間のトラブルを裁判外で解決するための制度の一つである。",a:"○",
+ conclusion:"正しい。",reason:"裁判によらず、中立的な機関を通じて紛争解決を図る制度である。",note:"生命保険業界にも指定紛争解決機関が設けられている。"},
+{id:"h17",cat:4,type:"tf",q:"保険法は、主に保険会社の監督に関するルールを定めた法律である。",a:"×",
+ conclusion:"誤り。",reason:"保険会社の監督に関するルールを定めるのは主に保険業法であり、保険法は契約当事者間の権利義務関係を定める法律である。",note:"保険業法（業者規制）と保険法（契約ルール）を区別しておく。"},
+{id:"h18",cat:4,type:"tf",q:"消費者契約法は、事業者と消費者の間の契約に関して、消費者を保護するための規定を置いている。",a:"○",
+ conclusion:"正しい。",reason:"消費者契約法は、不当な勧誘等から消費者を保護する規定を置いている。",note:"保険契約にも一般法として関係し得る。"},
+{id:"h19",cat:4,type:"tf",q:"金融サービス提供法（旧金融商品販売法）は、金融商品の販売に際して説明義務等を定めている。",a:"○",
+ conclusion:"正しい。",reason:"金融商品の販売にあたり、重要事項の説明義務等を定めている法律である。",note:"説明義務違反があった場合の損害賠償責任等も定められている。"},
+{id:"h20",cat:4,type:"choice",q:"保険業法上、生命保険会社が兼営できない業務として一般的に説明されるものを選びなさい。",
+ choices:["生命保険業","損害保険業の全面的な兼営","附随業務の一部"],a:1,
+ conclusion:"「損害保険業の全面的な兼営」が正しい。",reason:"生命保険会社は原則として損害保険業を全面的に兼営することはできないとされている。",note:"第三分野保険など一部の兼営が認められる範囲は別途定められている。"},
+{id:"h21",cat:4,type:"tf",q:"個人情報保護法における「要配慮個人情報」には、病歴等のセンシティブな情報が含まれる。",a:"○",
+ conclusion:"正しい。",reason:"病歴等の要配慮個人情報は、取得・利用に特に注意が必要な情報とされる。",note:"生命保険の告知内容には要配慮個人情報が含まれることが多い。"},
+{id:"h22",cat:4,type:"tf",q:"生命保険会社の業務は、金融庁による検査・監督の対象となる。",a:"○",
+ conclusion:"正しい。",reason:"保険業法に基づき、金融庁が保険会社の業務を検査・監督する。",note:"健全性・適切性の確保を目的としている。"},
+{id:"h23",cat:4,type:"tf",q:"保険契約者保護機構への加入は、国内で事業を行う生命保険会社にとって任意である。",a:"×",
+ conclusion:"誤り。",reason:"国内で生命保険業を営む会社は、原則として保険契約者保護機構への加入が義務付けられている。",note:"契約者保護のセーフティネットとして機能する。"},
+{id:"h24",cat:4,type:"tf",q:"募集人登録の抹消事由には、一定の犯罪行為等による処分が含まれることがある。",a:"○",
+ conclusion:"正しい。",reason:"一定の犯罪行為や重大な違反があった場合、登録が抹消されることがある。",note:"募集人としての適格性を維持するための仕組みである。"},
+{id:"h25",cat:4,type:"tf",q:"保険業法上の「特定保険契約」には、金融商品取引法の規定の一部が準用される場合がある（変額保険・外貨建保険等）。",a:"○",
+ conclusion:"正しい。",reason:"運用リスクを伴う特定保険契約には、金融商品取引法の規定の一部が準用される。",note:"適合性の原則等、投資性の高い商品に共通するルールが適用される。"},
+{id:"h26",cat:4,type:"tf",q:"生命保険協会は、募集人に対する教育のほか、業界の自主規制機関としての役割も担っている。",a:"○",
+ conclusion:"正しい。",reason:"教育制度の運営に加え、自主規制機関としての役割も担っている。",note:"業界全体の健全な発展と契約者保護を目的とする。"},
+{id:"h27",cat:4,type:"tf",q:"保険会社の破綻処理に関する手続きは、保険業法に規定が置かれている。",a:"○",
+ conclusion:"正しい。",reason:"保険会社の破綻処理手続きは保険業法に規定されている。",note:"契約者保護機構による支援等もこの枠組みの一部である。"},
+{id:"h28",cat:4,type:"tf",q:"犯罪収益移転防止法における取引時確認では、本人特定事項の確認が求められる。",a:"○",
+ conclusion:"正しい。",reason:"氏名・住所・生年月日等の本人特定事項の確認が求められる。",note:"マネー・ローンダリング対策の一環である。"},
+{id:"h29",cat:4,type:"tf",q:"保険業法違反があった場合、募集人だけでなく所属保険会社が行政処分の対象となることがある。",a:"○",
+ conclusion:"正しい。",reason:"募集人の管理責任を負う所属保険会社も行政処分の対象となり得る。",note:"募集人管理態勢の整備が会社側にも求められる。"},
+{id:"h30",cat:4,type:"tf",q:"法令等遵守（コンプライアンス）の徹底は、保険会社の自主的な取り組みに委ねられており、法律上の義務ではない。",a:"×",
+ conclusion:"誤り。",reason:"保険業法等の法令遵守は法律上の義務であり、単なる自主的な取り組みにとどまらない。",note:"法令遵守は事業継続の前提条件である。"},
+
+// 6. 商品知識（主契約・特約）
+{id:"s01",cat:5,type:"tf",q:"主契約は単独で契約できるが、特約は原則として主契約に付加する形でのみ契約できる。",a:"○",
+ conclusion:"正しい。",reason:"特約は主契約に付加して保障を上乗せする仕組みであり、単独では契約できないのが原則である。",note:"主契約が消滅すると、付加していた特約も消滅するのが一般的である。"},
+{id:"s02",cat:5,type:"tf",q:"医療保険の入院給付金は、一般に入院日数に応じて支払われる。",a:"○",
+ conclusion:"正しい。",reason:"入院給付金は、所定の入院日数に応じて日額×日数などの形で支払われるのが一般的である。",note:"商品によっては1日目から支払われるものと、一定日数以降から支払われるものがある。"},
+{id:"s03",cat:5,type:"tf",q:"特定疾病保障保険では、がん・急性心筋梗塞・脳卒中など所定の状態に該当した場合に、生存中でも保険金が支払われることがある。",a:"○",
+ conclusion:"正しい。",reason:"三大疾病など所定の状態に該当すると、死亡前でも保険金（特定疾病保険金）が支払われる仕組みである。",note:"特定疾病保険金を受け取ると、契約は消滅するのが一般的である。"},
+{id:"s04",cat:5,type:"tf",q:"収入保障保険は、死亡時に一時金でまとまった金額のみを受け取る保険であり、年金形式では受け取れない。",a:"×",
+ conclusion:"誤り。",reason:"収入保障保険は、死亡後の残存保険期間に応じて年金形式で保険金を受け取れる点が特徴である。",note:"多くの商品では、一括受取（一時金）へ変更できるオプションも用意されている。"},
+{id:"s05",cat:5,type:"tf",q:"定期保険特約付終身保険は、終身保険を主契約とし、一定期間の死亡保障を定期保険特約で上乗せする仕組みである。",a:"○",
+ conclusion:"正しい。",reason:"終身保険を土台に、子育て期間など保障が多く必要な期間を定期保険特約で厚くする設計である。",note:"特約の保険期間が終了すると、主契約の終身保険部分の保障のみが残る。"},
+{id:"s06",cat:5,type:"tf",q:"リビング・ニーズ特約は、被保険者の余命が一定期間以内と判断された場合に、死亡保険金の一部または全部を生前に受け取れる特約である。",a:"○",
+ conclusion:"正しい。",reason:"余命宣告を受けた際に、死亡保険金の全部または一部を生前給付として受け取れる特約である。",note:"多くの場合、特約自体の保険料負担はない。"},
+{id:"s07",cat:5,type:"tf",q:"指定代理請求特約は、被保険者本人が保険金等を請求できない事情がある場合に、あらかじめ指定された代理人が請求できる特約である。",a:"○",
+ conclusion:"正しい。",reason:"傷病等により本人が請求できない場合に備え、あらかじめ指定した代理人が請求できる制度である。",note:"指定代理請求人の範囲は契約者の家族など一定の範囲に限られる。"},
+{id:"s08",cat:5,type:"choice",q:"次のうち、第三分野の保険に分類されるものを選びなさい。",
+ choices:["終身保険","医療保険","養老保険"],a:1,
+ conclusion:"「医療保険」が第三分野に分類される。",reason:"医療保険・がん保険・介護保険などは、生命保険（第一分野）と損害保険（第二分野）の中間に位置する第三分野の保険とされる。",note:"終身保険・養老保険は生命保険（第一分野）に分類される。"},
+{id:"s09",cat:5,type:"tf",q:"変額保険は、資産運用実績によって死亡保険金額や解約返戻金額が変動する保険である。",a:"○",
+ conclusion:"正しい。",reason:"特別勘定による資産運用の実績に応じて、保険金額や解約返戻金が変動する仕組みである。",note:"多くの商品では、死亡保険金には最低保証が設けられている。"},
+{id:"s10",cat:5,type:"tf",q:"外貨建て保険は、為替レートの変動によって円換算の受取額が変動することがある。",a:"○",
+ conclusion:"正しい。",reason:"外貨建て保険は外貨で運用・支払いが行われるため、為替レートの変動が円換算額に影響する。",note:"為替手数料や為替リスクについて、契約前に十分な説明が必要とされる。"},
+{id:"s11",cat:5,type:"tf",q:"生命保険は、大きく「死亡保険」「生存保険」「生死混合保険」に分類されることがある。",a:"○",
+ conclusion:"正しい。",reason:"保障の目的に応じて、死亡保険・生存保険・生死混合保険（養老保険等）に分類される。",note:"養老保険は代表的な生死混合保険である。"},
+{id:"s12",cat:5,type:"tf",q:"がん保険は、がんによる入院・手術・診断等に対して給付金が支払われる保険である。",a:"○",
+ conclusion:"正しい。",reason:"がんの診断・入院・手術等の各段階に応じた給付金が用意されているのが一般的である。",note:"免責期間（待ち期間）が設けられていることが多い。"},
+{id:"s13",cat:5,type:"choice",q:"就業不能状態が続いた場合に給付金が支払われる保険を何というか。",
+ choices:["就業不能保険","生存給付金付定期保険","財形保険"],a:0,
+ conclusion:"「就業不能保険」が正しい。",reason:"病気やケガで働けない状態が続いた場合に給付金を受け取れる保険である。",note:"所得補償保険と近い性質を持つ商品もある。"},
+{id:"s14",cat:5,type:"tf",q:"介護保険（民間の生命保険会社が販売するもの）は、所定の要介護状態になった場合に給付金が支払われる。",a:"○",
+ conclusion:"正しい。",reason:"所定の要介護状態に該当した場合に、一時金や年金形式で給付金が支払われる。",note:"公的介護保険とは別の、民間の生命保険商品である。"},
+{id:"s15",cat:5,type:"tf",q:"こども保険（学資保険）は、進学時期等に合わせて祝金・満期保険金を受け取れる保険である。",a:"○",
+ conclusion:"正しい。",reason:"入学・進学等の時期に合わせて祝金や満期保険金を受け取れる設計になっている。",note:"教育資金の準備を目的とした商品である。"},
+{id:"s16",cat:5,type:"tf",q:"こども保険には、契約者（親等）が死亡した場合、以後の保険料が免除される保障が付いていることが多い。",a:"○",
+ conclusion:"正しい。",reason:"契約者に万一のことがあった場合でも、以後の保険料払込みが免除される仕組みが一般的である。",note:"保険料免除後も、祝金・満期保険金は予定どおり受け取れる設計が多い。"},
+{id:"s17",cat:5,type:"tf",q:"団体保険は、企業等の団体が契約者となり、その構成員を被保険者とする保険である。",a:"○",
+ conclusion:"正しい。",reason:"企業等の団体を契約者とし、そこに所属する人を被保険者とする保険である。",note:"個人契約に比べて割安な保険料で加入できる場合がある。"},
+{id:"s18",cat:5,type:"tf",q:"財形保険は、勤労者の財産形成を支援する目的を持つ保険商品の一種である。",a:"○",
+ conclusion:"正しい。",reason:"勤労者財産形成促進法に基づき、財産形成を支援する目的で設けられた制度に関連する保険である。",note:"税制上の優遇が設けられている場合がある。"},
+{id:"s19",cat:5,type:"tf",q:"引受基準緩和型保険は、通常より告知項目が少なく、持病がある人でも加入しやすい設計になっている。",a:"○",
+ conclusion:"正しい。",reason:"告知項目を絞ることで、持病等がある人でも加入しやすくした商品である。",note:"一般に保険料は通常の商品より割高に設定される。"},
+{id:"s20",cat:5,type:"tf",q:"無選択型保険は、健康状態の告知や診査が一切不要で、誰でも同じ保険料で加入できる保険である。",a:"○",
+ conclusion:"正しい。",reason:"告知・診査を必要とせず加入できる保険である。",note:"保険料は割高で、保障内容にも制限が設けられることが多い。"},
+{id:"s21",cat:5,type:"choice",q:"主契約の保険料払込みが困難になった場合に、保険料の払込みを免除する特約を何というか。",
+ choices:["保険料払込免除特約","契約者貸付特約","転換特約"],a:0,
+ conclusion:"「保険料払込免除特約」が正しい。",reason:"所定の状態に該当した場合、以後の保険料払込みが免除される特約である。",note:"高度障害状態や特定の疾病等が対象となることが多い。"},
+{id:"s22",cat:5,type:"tf",q:"三大疾病（特定疾病）保障保険の対象は、一般にがん・急性心筋梗塞・脳卒中とされる。",a:"○",
+ conclusion:"正しい。",reason:"三大疾病として、がん・急性心筋梗塞・脳卒中が一般的に挙げられる。",note:"商品によって対象疾病の範囲や条件が異なる場合がある。"},
+{id:"s23",cat:5,type:"tf",q:"先進医療特約は、公的医療保険の対象とならない先進医療にかかる技術料等を保障する特約である。",a:"○",
+ conclusion:"正しい。",reason:"公的医療保険の適用外である先進医療の技術料等を保障する特約である。",note:"技術料は高額になることがあり、備えの必要性が説明されることが多い。"},
+{id:"s24",cat:5,type:"tf",q:"通院特約は、入院を伴わない通院のみでも給付対象となる場合がある。",a:"○",
+ conclusion:"正しい。",reason:"商品によっては、入院を伴わない通院のみでも給付対象となる設計がある。",note:"多くは入院後の通院を対象とする設計が一般的である。"},
+{id:"s25",cat:5,type:"tf",q:"家族収入保険（家族収入特約）は、被保険者の死亡後、年金形式で保険金を受け取れる仕組みを持つことが多い。",a:"○",
+ conclusion:"正しい。",reason:"死亡後の残存期間に応じて年金形式で受け取れる設計が一般的である。",note:"収入保障保険と近い性質を持つ。"},
+{id:"s26",cat:5,type:"tf",q:"定期保険は、一般に解約返戻金がほとんどない、または低く設計されている商品が多い。",a:"○",
+ conclusion:"正しい。",reason:"定期保険は掛け捨て型が多く、解約返戻金が低い、またはほとんどないのが一般的である。",note:"その分、保険料は終身保険等に比べて割安になりやすい。"},
+{id:"s27",cat:5,type:"tf",q:"低解約返戻金型保険は、保険料払込期間中の解約返戻金を通常より低く抑えることで、保険料を割安にする設計である。",a:"○",
+ conclusion:"正しい。",reason:"払込期間中の解約返戻金を抑える代わりに、保険料を割安にした設計である。",note:"払込満了後は解約返戻金が通常水準に戻ることが多い。"},
+{id:"s28",cat:5,type:"tf",q:"生存給付金付定期保険は、生存中に一定期間ごとに給付金を受け取れる定期保険である。",a:"○",
+ conclusion:"正しい。",reason:"死亡保障に加えて、生存中も一定期間ごとに給付金を受け取れる設計の定期保険である。",note:"貯蓄性の高い定期保険として位置づけられる。"},
+{id:"s29",cat:5,type:"tf",q:"特約は、主契約とは独立して、主契約消滅後も保障が継続するのが一般的である。",a:"×",
+ conclusion:"誤り。",reason:"特約は主契約に付加されており、主契約が消滅すると特約も消滅するのが一般的である。",note:"特約単独での保障継続は原則として想定されていない。"},
+{id:"s30",cat:5,type:"tf",q:"変額個人年金保険は、運用実績に応じて将来受け取る年金額等が変動する保険である。",a:"○",
+ conclusion:"正しい。",reason:"特別勘定の運用実績に応じて、将来の年金額等が変動する仕組みである。",note:"死亡給付金に最低保証が設けられている商品もある。"}
+];
+
+/* ---------------- storage ---------------- */
+const STORE_KEY = "seiho_ippan_manabi_sprint_v1";
+function loadStore(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { records:{}, totalSolved:0, totalCorrect:0, rounds:0, lastResults:{} };
+}
+function saveStore(){ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+let store = loadStore();
+QUESTIONS.forEach(q=>{ if(!store.records[q.id]) store.records[q.id] = {seen:0, correct:0, wrong:0, lastResult:null}; });
+
+/* ---------------- state ---------------- */
+let session = null; // {mode, queue:[ids], idx, correctCount, startedAt, catStats:{}}
+let awaitingNext = false;
+let autoTimer = null;
+
+const $ = sel => document.querySelector(sel);
+const byId = id => QUESTIONS.find(q=>q.id===id);
+
+function show(screenId){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("#"+screenId).classList.add("active");
+}
+
+/* ---------------- home stats ---------------- */
+function refreshHome(){
+  $("#stat-solved").textContent = store.totalSolved;
+  $("#stat-rate").textContent = store.totalSolved ? Math.round(store.totalCorrect/store.totalSolved*100)+"%" : "–";
+  $("#stat-rounds").textContent = store.rounds;
+
+  const unseen = QUESTIONS.filter(q=>store.records[q.id].seen===0).length;
+  const wrong = QUESTIONS.filter(q=>store.records[q.id].lastResult===false).length;
+  const weak = QUESTIONS.filter(q=>store.records[q.id].wrong>=2).length;
+  $("#count-unseen").textContent = unseen+"問";
+  $("#count-wrong").textContent = wrong+"問";
+  $("#count-weak").textContent = weak+"問";
+}
+
+/* ---------------- mode -> queue ---------------- */
+function pickPerCategory(n, pool){
+  const result = [];
+  for(let c=0;c<CATEGORIES.length;c++){
+    const catQ = pool.filter(q=>q.cat===c);
+    shuffle(catQ);
+    result.push(...catQ.slice(0,n).map(q=>q.id));
+  }
+  return shuffle(result);
+}
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function buildQueue(mode, catIndex){
+  switch(mode){
+    case "sprint12": return pickPerCategory(2, QUESTIONS);
+    case "training30": return pickPerCategory(5, QUESTIONS);
+    case "challenge60": return pickPerCategory(10, QUESTIONS);
+    case "category": return shuffle(QUESTIONS.filter(q=>q.cat===catIndex).map(q=>q.id));
+    case "unseen": {
+      let q = QUESTIONS.filter(q=>store.records[q.id].seen===0);
+      if(q.length===0) q = QUESTIONS.slice();
+      return shuffle(q.map(q=>q.id)).slice(0,20);
+    }
+    case "wrong": {
+      let q = QUESTIONS.filter(q=>store.records[q.id].lastResult===false);
+      return shuffle(q.map(q=>q.id));
+    }
+    case "weak": {
+      let q = QUESTIONS.filter(q=>store.records[q.id].wrong>=2);
+      return shuffle(q.map(q=>q.id));
+    }
+    case "random": return shuffle(QUESTIONS.map(q=>q.id));
+    default: return pickPerCategory(2, QUESTIONS);
+  }
+}
+
+const MODE_LABEL = {
+  sprint12:"12問スプリント", training30:"30問トレーニング", challenge60:"60問チャレンジ",
+  category:"分野別", unseen:"未出題", wrong:"間違えた問題", weak:"苦手問題", random:"ランダム"
+};
+
+function startSession(mode, catIndex){
+  const queue = buildQueue(mode, catIndex);
+  if(queue.length===0){
+    alert("対象の問題がまだありません。他のモードを試してください。");
+    return;
+  }
+  session = {
+    mode, queue, idx:0, correctCount:0,
+    startedAt: Date.now(),
+    catStats: {}, // cat -> {correct, total}
+    reviewIds: []
+  };
+  $("#quiz-mode-name").textContent = MODE_LABEL[mode] || "学習";
+  show("screen-quiz");
+  renderQuestion();
+}
+
+/* ---------------- quiz rendering ---------------- */
+function renderQuestion(){
+  awaitingNext = false;
+  clearTimeout(autoTimer);
+  const total = session.queue.length;
+  const qid = session.queue[session.idx];
+  const q = byId(qid);
+
+  $("#progress-count").textContent = (session.idx+1)+" / "+total;
+  $("#progress-streak").textContent = "連続正解 "+currentStreak();
+  $("#progress-bar").style.width = Math.round((session.idx)/total*100)+"%";
+
+  $("#q-cat-tag").textContent = CATEGORIES[q.cat];
+  $("#q-text").textContent = q.q;
+
+  const area = $("#choices-area");
+  area.innerHTML = "";
+
+  if(q.type === "multi"){
+    renderMultiChoice(q, area);
+  } else {
+    const wrap = document.createElement("div");
+    wrap.className = "choices" + (q.type==="tf" ? " tf" : "");
+    const labels = q.type==="tf" ? ["○","×"] : q.choices;
+    labels.forEach((label,i)=>{
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = q.type==="tf" ? label : (["ア","イ","ウ"][i]+"　"+label);
+      btn.addEventListener("click", ()=>onAnswer(q, i, btn, wrap));
+      wrap.appendChild(btn);
+    });
+    area.appendChild(wrap);
+  }
+  $("#answer-area").style.display = "none";
+}
+
+function currentStreak(){
+  return session.streak||0;
+}
+
+function onAnswer(q, choiceIndex, btnEl, wrapEl){
+  if(awaitingNext) return;
+  awaitingNext = true;
+
+  const correctIndex = q.type==="tf" ? (q.a==="○"?0:1) : q.a;
+  const isCorrect = choiceIndex === correctIndex;
+
+  Array.from(wrapEl.children).forEach((el,i)=>{
+    el.setAttribute("disabled","true");
+    if(i===correctIndex) el.classList.add("correct");
+    else if(i===choiceIndex) el.classList.add("wrong");
+    else el.classList.add("dim");
+  });
+
+  const correctDisplay = q.type==="tf" ? q.a : (["ア","イ","ウ"][q.a]+" "+q.choices[q.a]);
+  finalizeAnswer(q, isCorrect, correctDisplay);
+}
+
+/* ---------------- multi-select (誤っているものをN個選択) ---------------- */
+function renderMultiChoice(q, area){
+  const need = q.correct.length;
+  const hint = document.createElement("div");
+  hint.className = "multi-hint";
+  hint.textContent = need+"つ選んでください（選択中 0/"+need+"）";
+  area.appendChild(hint);
+
+  const wrap = document.createElement("div");
+  wrap.className = "choices";
+  const selected = new Set();
+  const labels = ["ア","イ","ウ","エ"];
+
+  const submitBtn = document.createElement("button");
+  submitBtn.className = "next-btn";
+  submitBtn.textContent = "回答する";
+  submitBtn.disabled = true;
+  submitBtn.style.marginTop = "0";
+
+  q.choices.forEach((label,i)=>{
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.textContent = labels[i]+"　"+label;
+    btn.addEventListener("click", ()=>{
+      if(awaitingNext) return;
+      if(selected.has(i)){
+        selected.delete(i);
+        btn.classList.remove("selected");
+      } else {
+        if(selected.size >= need) return;
+        selected.add(i);
+        btn.classList.add("selected");
+      }
+      hint.textContent = need+"つ選んでください（選択中 "+selected.size+"/"+need+"）";
+      submitBtn.disabled = selected.size !== need;
+    });
+    wrap.appendChild(btn);
+  });
+  area.appendChild(wrap);
+
+  submitBtn.addEventListener("click", ()=>onMultiAnswer(q, Array.from(selected), wrap, submitBtn, hint));
+  area.appendChild(submitBtn);
+}
+
+function onMultiAnswer(q, selectedIndices, wrapEl, submitBtn, hintEl){
+  if(awaitingNext) return;
+  awaitingNext = true;
+
+  const correctSet = new Set(q.correct);
+  const selSet = new Set(selectedIndices);
+  const isCorrect = correctSet.size===selSet.size && [...correctSet].every(i=>selSet.has(i));
+  const labels = ["ア","イ","ウ","エ"];
+
+  Array.from(wrapEl.children).forEach((el,i)=>{
+    el.setAttribute("disabled","true");
+    if(correctSet.has(i)) el.classList.add("correct");
+    else if(selSet.has(i)) el.classList.add("wrong");
+    else el.classList.add("dim");
+  });
+  submitBtn.disabled = true;
+  submitBtn.style.display = "none";
+  hintEl.style.display = "none";
+
+  const correctDisplay = q.correct.map(i=>labels[i]).join("・");
+  finalizeAnswer(q, isCorrect, correctDisplay);
+}
+
+function finalizeAnswer(q, isCorrect, correctDisplay){
+  const rec = store.records[q.id];
+  rec.seen += 1;
+  if(isCorrect){ rec.correct += 1; rec.lastResult = true; }
+  else { rec.wrong += 1; rec.lastResult = false; session.reviewIds.push(q.id); }
+  store.totalSolved += 1;
+  if(isCorrect) store.totalCorrect += 1;
+  saveStore();
+
+  session.streak = isCorrect ? (session.streak||0)+1 : 0;
+  if(isCorrect) session.correctCount += 1;
+  const cs = session.catStats[q.cat] || {correct:0,total:0};
+  cs.total += 1; if(isCorrect) cs.correct += 1;
+  session.catStats[q.cat] = cs;
+
+  const banner = $("#result-banner");
+  banner.className = "result-banner " + (isCorrect?"ok":"ng");
+  banner.textContent = isCorrect ? "正解" : "不正解　正解は「"+correctDisplay+"」";
+
+  $("#ex-conclusion").textContent = q.conclusion;
+  $("#ex-reason").textContent = q.reason;
+  if(q.note){ $("#ex-note-row").style.display="block"; $("#ex-note").textContent = q.note; }
+  else { $("#ex-note-row").style.display="none"; }
+
+  $("#answer-area").style.display = "block";
+  $("#progress-bar").style.width = Math.round((session.idx+1)/session.queue.length*100)+"%";
+  $("#progress-streak").textContent = "連続正解 "+session.streak;
+
+  autoTimer = setTimeout(goNext, 1800);
+}
+
+function goNext(){
+  clearTimeout(autoTimer);
+  session.idx += 1;
+  if(session.idx >= session.queue.length){
+    finishSession();
+  } else {
+    renderQuestion();
+  }
+}
+
+function finishSession(){
+  store.rounds += 1;
+  const prevKey = "prev_"+session.mode;
+  const prevRate = store.lastResults[prevKey];
+  const rate = Math.round(session.correctCount/session.queue.length*100);
+  store.lastResults[prevKey] = rate;
+  saveStore();
+
+  const elapsed = Math.round((Date.now()-session.startedAt)/1000);
+  $("#r-score").textContent = session.correctCount+"/"+session.queue.length;
+  $("#r-rate").textContent = rate+"%";
+  const ringEl = $("#ring-fill");
+  if(ringEl){
+    const circumference = 402;
+    const offset = circumference * (1 - rate/100);
+    ringEl.style.strokeDasharray = String(circumference);
+    ringEl.style.strokeDashoffset = String(circumference);
+    requestAnimationFrame(()=>{ ringEl.style.strokeDashoffset = String(offset); });
+  }
+  $("#r-time").textContent = Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
+  $("#r-rounds").textContent = store.rounds;
+
+  let msg = "今日も"+session.queue.length+"問進みました";
+  if(prevRate!==undefined){
+    if(rate > prevRate) msg = "前回より正解できる問題が増えています";
+    else if(rate === prevRate) msg = "この分野をもう一周しました";
+    else msg = "またここから始められます";
+  }
+  $("#r-message").textContent = msg;
+
+  const breakdown = $("#r-cat-breakdown");
+  breakdown.innerHTML = "";
+  Object.keys(session.catStats).sort((a,b)=>a-b).forEach(c=>{
+    const cs = session.catStats[c];
+    const row = document.createElement("div");
+    row.className = "weak-item";
+    const pct = Math.round(cs.correct/cs.total*100);
+    row.innerHTML = '<span class="n">'+CATEGORIES[c]+'</span><span class="p">'+cs.correct+'/'+cs.total+'（'+pct+'%）</span>';
+    breakdown.appendChild(row);
+  });
+
+  const reviewBox = $("#r-review");
+  const uniqueReview = [...new Set(session.reviewIds)];
+  if(uniqueReview.length===0){
+    reviewBox.innerHTML = '<div class="empty-weak">この分野をもう一周しました。復習対象はありません。</div>';
+  } else {
+    reviewBox.innerHTML = "";
+    uniqueReview.forEach(id=>{
+      const q = byId(id);
+      const row = document.createElement("div");
+      row.className = "weak-item";
+      row.innerHTML = '<span class="n">'+CATEGORIES[q.cat]+'</span><span class="p">この問題は復習に追加しました</span>';
+      reviewBox.appendChild(row);
+    });
+  }
+
+  refreshHome();
+  show("screen-result");
+}
+
+/* ---------------- events ---------------- */
+document.querySelectorAll(".mode-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const mode = btn.dataset.mode;
+    if(mode==="category"){ openCategoryModal(); return; }
+    startSession(mode);
+  });
+});
+
+function openCategoryModal(){
+  const list = $("#modal-cat-list");
+  list.innerHTML = "";
+  CATEGORIES.forEach((name,i)=>{
+    const b = document.createElement("button");
+    b.className = "modal-cat-btn";
+    const total = QUESTIONS.filter(q=>q.cat===i).length;
+    b.textContent = name + "（全"+total+"問）";
+    b.addEventListener("click", ()=>{ closeCategoryModal(); startSession("category", i); });
+    list.appendChild(b);
+  });
+  $("#modal-cat").classList.add("active");
+}
+function closeCategoryModal(){ $("#modal-cat").classList.remove("active"); }
+$("#modal-cat-close").addEventListener("click", closeCategoryModal);
+$("#modal-cat").addEventListener("click", e=>{ if(e.target.id==="modal-cat") closeCategoryModal(); });
+
+$("#btn-quiz-back").addEventListener("click", ()=>{
+  clearTimeout(autoTimer);
+  refreshHome();
+  show("screen-home");
+});
+$("#btn-next").addEventListener("click", goNext);
+$("#btn-continue").addEventListener("click", ()=>{
+  const mode = session.mode;
+  startSession(mode);
+});
+$("#btn-home").addEventListener("click", ()=>{
+  refreshHome();
+  show("screen-home");
+});
+
+/* ---------------- init ---------------- */
+refreshHome();
+</script>
+</body>
+</html>
