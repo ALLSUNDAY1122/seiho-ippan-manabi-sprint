@@ -1257,10 +1257,23 @@ document.querySelectorAll(".mode-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     const mode = btn.dataset.mode;
     if(mode==="category"){ openCategoryModal(); return; }
-    if(mode==="examPicker"){ openExamPicker(); return; }
+    if(mode==="examPicker"){
+      if(!requirePremium()) return;
+      openExamPicker();
+      return;
+    }
+    if(mode==="challenge60" && !requirePremium()) return;
     startSession(mode);
   });
 });
+
+function requirePremium(){
+  // ブラウザ版は試用できるよう無料のまま、ネイティブ版だけStoreKitで制御する。
+  const isNative = Boolean(window.webkit?.messageHandlers?.purchaseBridge);
+  if(!isNative || window.__nativePremium===true) return true;
+  window.webkit.messageHandlers.purchaseBridge.postMessage({action:"showPaywall"});
+  return false;
+}
 
 function openCategoryModal(){
   const list = $("#modal-cat-list");
