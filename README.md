@@ -16,6 +16,8 @@ python -m http.server 8080
 
 このフォルダを専用GitHubリポジトリのルートへ配置し、GitHub Pagesの公開元をActionsに設定します。`main`へのpushで `.github/workflows/pages.yml` がデプロイします。
 
+公開先: https://allsunday1122.github.io/seiho-ippan-manabi-sprint/
+
 ## 検証状況
 
 - 収録問題：212問（6分野）
