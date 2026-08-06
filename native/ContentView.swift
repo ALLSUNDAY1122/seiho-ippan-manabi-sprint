@@ -13,7 +13,7 @@ struct ContentView: View {
             .ignoresSafeArea()
 
             if !purchases.hasPremium {
-                Button("プレミアム機能を見る") {
+                Button("Premium") {
                     showingPaywall = true
                 }
                 .font(.footnote.bold())
@@ -43,6 +43,7 @@ private struct StudyWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.userContentController.add(context.coordinator, name: "purchaseBridge")
+
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = false
         webView.scrollView.contentInsetAdjustmentBehavior = .never

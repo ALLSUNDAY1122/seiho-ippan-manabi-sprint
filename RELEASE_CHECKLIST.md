@@ -4,7 +4,7 @@
 - [x] Fix subscription and lifetime product IDs
 - [x] Implement StoreKit 2 purchase and restore logic
 - [x] Draft App Store copy
-- [ ] Register the App Store Connect app
+- [x] Register the App Store Connect app (Apple ID `6798736588`)
 - [ ] Create subscription group and monthly product
 - [ ] Create lifetime product
 - [ ] Create icon, screenshots, and Privacy Manifest

@@ -5,6 +5,7 @@
 - アプリ名: 生命保険 一般課程試験｜学びスプリント
 - Bundle ID: `com.allsunday1122.seiho.ippan`
 - SKU: `seiho-ippan-manabi-sprint-ios`
+- App Store Connect Apple ID: `6798736588`
 - バージョン: 1.0.0
 - カテゴリ: 教育
 - サポートURL: `https://allsunday1122.github.io/seiho-ippan-manabi-sprint/`

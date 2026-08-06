@@ -1,0 +1,31 @@
+workflows:
+  ios-testflight-internal:
+    name: Seiho Ippan TestFlight (internal)
+    max_build_duration: 60
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.allsunday1122.seiho.ippan
+      vars:
+        XCODE_PROJECT: SeihoIppanManabiSprint.xcodeproj
+        XCODE_SCHEME: SeihoIppanManabiSprint
+    scripts:
+      - name: Install XcodeGen
+        script: brew install xcodegen
+      - name: Generate Xcode project
+        script: xcodegen generate
+      - name: Apply App Store provisioning profile
+        script: xcode-project use-profiles --project "$XCODE_PROJECT"
+      - name: Build IPA
+        script: xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false

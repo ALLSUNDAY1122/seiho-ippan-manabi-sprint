@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 import StoreKit
 
 @MainActor
@@ -22,100 +22,68 @@ final class PurchaseManager: ObservableObject {
         Task { await loadProductsAndEntitlements() }
     }
 
-    deinit {
-        updatesTask?.cancel()
-    }
+    deinit { updatesTask?.cancel() }
 
-    var hasPremium: Bool {
-        !purchasedProductIDs.isEmpty
-    }
-
-    var monthlyProduct: Product? {
-        products.first { $0.id == Self.monthlyProductID }
-    }
-
-    var lifetimeProduct: Product? {
-        products.first { $0.id == Self.lifetimeProductID }
-    }
+    var hasPremium: Bool { !purchasedProductIDs.isEmpty }
+    var monthlyProduct: Product? { products.first { $0.id == Self.monthlyProductID } }
+    var lifetimeProduct: Product? { products.first { $0.id == Self.lifetimeProductID } }
 
     func loadProductsAndEntitlements() async {
         isLoading = true
         defer { isLoading = false }
-
         do {
             products = try await Product.products(for: Self.productIDs)
-                .sorted { lhs, rhs in
-                    lhs.id == Self.monthlyProductID && rhs.id != Self.monthlyProductID
-                }
+                .sorted { $0.id == Self.monthlyProductID && $1.id != Self.monthlyProductID }
             await refreshEntitlements()
         } catch {
-            errorMessage = "商品情報を読み込めませんでした。通信状態を確認してください。"
+            errorMessage = "Unable to load purchase options. Please try again."
         }
     }
 
     func purchase(_ product: Product) async {
         isLoading = true
         defer { isLoading = false }
-
         do {
-            let result = try await product.purchase()
-            switch result {
-            case .success(let verification):
-                await handle(verification)
-            case .pending:
-                errorMessage = "購入の承認待ちです。"
-            case .userCancelled:
-                break
-            @unknown default:
-                break
+            switch try await product.purchase() {
+            case .success(let verification): await handle(verification)
+            case .pending: errorMessage = "Purchase approval is pending."
+            case .userCancelled: break
+            @unknown default: break
             }
         } catch {
-            errorMessage = "購入を完了できませんでした。もう一度お試しください。"
+            errorMessage = "Purchase could not be completed. Please try again."
         }
     }
 
     func restorePurchases() async {
         isLoading = true
         defer { isLoading = false }
-
         do {
             try await AppStore.sync()
             await refreshEntitlements()
         } catch {
-            errorMessage = "購入を復元できませんでした。"
+            errorMessage = "Purchases could not be restored."
         }
     }
 
     private func refreshEntitlements() async {
         var active = Set<String>()
         for await verification in Transaction.currentEntitlements {
-            if let productID = await verifiedActiveProductID(from: verification) {
-                active.insert(productID)
-            }
+            guard case .verified(let transaction) = verification,
+                  transaction.revocationDate == nil,
+                  transaction.expirationDate.map({ $0 > Date() }) ?? true else { continue }
+            active.insert(transaction.productID)
         }
         purchasedProductIDs = active
     }
 
-    private func verifiedActiveProductID(
-        from verification: VerificationResult<Transaction>
-    ) async -> String? {
-        guard case .verified(let transaction) = verification else { return nil }
-        guard transaction.revocationDate == nil else { return nil }
-        if let expirationDate = transaction.expirationDate, expirationDate <= Date() {
-            return nil
-        }
-        await transaction.finish()
-        return transaction.productID
-    }
-
     private func handle(_ verification: VerificationResult<Transaction>) async {
         guard case .verified(let transaction) = verification else {
-            errorMessage = "購入の検証に失敗しました。"
+            errorMessage = "Purchase verification failed."
             return
         }
-
         if transaction.revocationDate == nil,
-           transaction.expirationDate == nil || transaction.expirationDate! > Date() {
+           transaction.expirationDate.map({ $0 > Date() }) ?? true {
             purchasedProductIDs.insert(transaction.productID)
         } else {
             purchasedProductIDs.remove(transaction.productID)
